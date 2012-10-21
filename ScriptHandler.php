@@ -38,7 +38,7 @@ class ScriptHandler
         if ($exists) {
             $io->write(sprintf('<info>Updating the "%s" file.</info>', $realFile));
         } else {
-            $io->write(sprintf('<info>Creating the parameters.yml file.</info>', $realFile));
+            $io->write(sprintf('<info>Creating the "%s" file.</info>', $realFile));
         }
 
         // Find the expected params
