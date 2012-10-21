@@ -27,7 +27,7 @@ class ScriptHandler
         }
 
         if (!is_file($distFile)) {
-            throw new \InvalidArgumentException(sprintf('The dist file "%s" does not exist. Check your dist-file config or create it.'));
+            throw new \InvalidArgumentException(sprintf('The dist file "%s" does not exist. Check your dist-file config or create it.', $distFile));
         }
 
         $exists = is_file($realFile);
@@ -36,15 +36,15 @@ class ScriptHandler
         $io = $event->getIO();
 
         if ($exists) {
-            $io->write('<info>Updating the parameters.yml file.</info>');
+            $io->write(sprintf('<info>Updating the "%s" file.</info>', $realFile));
         } else {
-            $io->write('<info>Creating the parameters.yml file.</info>');
+            $io->write(sprintf('<info>Creating the parameters.yml file.</info>', $realFile));
         }
 
         // Find the expected params
         $expectedValues = $yamlParser->parse(file_get_contents($distFile));
         if (!isset($expectedValues['parameters'])) {
-            throw new \InvalidArgumentException('The parameters.yml.dist file seems invalid.');
+            throw new \InvalidArgumentException('The dist file seems invalid.');
         }
         $expectedParams = (array) $expectedValues['parameters'];
 
