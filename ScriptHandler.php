@@ -51,7 +51,11 @@ class ScriptHandler
         // find the actual params
         $actualValues = array('parameters' => array());
         if ($exists) {
-            $actualValues = array_merge($actualValues, $yamlParser->parse(file_get_contents($realFile)));
+            $existingValues = $yamlParser->parse(file_get_contents($realFile));
+            if (!is_array($existingValues)) {
+                throw new \InvalidArgumentException(sprintf('The existing "%s" file does not contain an array', $realFile));
+            }
+            $actualValues = array_merge($actualValues, $existingValues);
         }
         $actualParams = (array) $actualValues['parameters'];
 
