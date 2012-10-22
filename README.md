@@ -6,7 +6,7 @@ a ``parameters`` key.
 
 ## Usage
 
-In your root composer.json, adds the following:
+Add the following in your root composer.json file:
 
 ```json
 {
@@ -78,5 +78,5 @@ If an environment variable is set, its value will always replace the value
 set in the existing parameters file.
 
 As environment variables can only be strings, they are also parsed as inline
-YAML values to allows specifying ``null``, ``false``, ``true`` or numbers
+Yaml values to allows specifying ``null``, ``false``, ``true`` or numbers
 easily.
