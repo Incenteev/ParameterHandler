@@ -80,3 +80,7 @@ set in the existing parameters file.
 As environment variables can only be strings, they are also parsed as inline
 Yaml values to allows specifying ``null``, ``false``, ``true`` or numbers
 easily.
+
+Warning: This parameters handler will overwrite any comments or spaces into
+your parameters.yml file so handle with care. So if you want to give format
+and comments to your parameter's file you should do it on your dist version.
