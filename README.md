@@ -41,7 +41,7 @@ file, suffixed by ``.dist``. This can be changed in the configuration:
     "extra": {
         "logsafe-parameters": {
             "file": "app/config/parameters.yml",
-            "dist-file": "app/config/parameters.dist.yml"
+            "dist-file": "some/other/folder/to/other/parameters/file/parameters.yml.dist"
         }
     }
 }
