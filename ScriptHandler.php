@@ -34,7 +34,7 @@ class ScriptHandler
 
         $yamlParser = new Parser();
         $io = $event->getIO();
-        
+
         $action = $exists ? 'Updating' : 'Creating';
         $io->write(sprintf('<info>%s the "%s" file.</info>', $action, $realFile));
 
