@@ -2,7 +2,7 @@
     "name": "incenteev/composer-parameter-handler",
     "description": "Composer script handling your ignored parameter file",
     "keywords": ["parameters management"],
-    "homepage": "https://github.com/LogSafe/ParameterHandler",
+    "homepage": "https://github.com/Incenteev/ParameterHandler",
     "license": "MIT",
     "authors": [
         {
