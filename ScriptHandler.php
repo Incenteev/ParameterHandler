@@ -1,6 +1,6 @@
 <?php
 
-namespace LogSafe\ParameterHandler;
+namespace Incenteev\ParameterHandler;
 
 use Composer\IO\IOInterface;
 use Composer\Script\Event;
@@ -14,16 +14,16 @@ class ScriptHandler
     {
         $extras = $event->getComposer()->getPackage()->getExtra();
 
-        if (empty($extras['logsafe-parameters']['file'])) {
-            throw new \InvalidArgumentException('The extra.logsafe-parameters.file setting is required to use this script handler.');
+        if (empty($extras['incenteev-parameters']['file'])) {
+            throw new \InvalidArgumentException('The extra.incenteev-parameters.file setting is required to use this script handler.');
         }
 
-        $realFile = $extras['logsafe-parameters']['file'];
+        $realFile = $extras['incenteev-parameters']['file'];
 
-        if (empty($extras['logsafe-parameters']['dist-file'])) {
+        if (empty($extras['incenteev-parameters']['dist-file'])) {
             $distFile = $realFile.'.dist';
         } else {
-            $distFile = $extras['logsafe-parameters']['dist-file'];
+            $distFile = $extras['incenteev-parameters']['dist-file'];
         }
 
         if (!is_file($distFile)) {
@@ -63,7 +63,7 @@ class ScriptHandler
             }
         }
 
-        $envMap = empty($extras['logsafe-parameters']['env-map']) ? array() : (array) $extras['logsafe-parameters']['env-map'];
+        $envMap = empty($extras['incenteev-parameters']['env-map']) ? array() : (array) $extras['incenteev-parameters']['env-map'];
 
         // Add the params coming from the environment values
         $actualParams = array_replace($actualParams, self::getEnvValues($envMap));

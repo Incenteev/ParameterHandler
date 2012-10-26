@@ -1,5 +1,5 @@
 {
-    "name": "logsafe/composer-parameter-handler",
+    "name": "incenteev/composer-parameter-handler",
     "description": "Composer script handling your ignored parameter file",
     "keywords": ["parameters management"],
     "homepage": "https://github.com/LogSafe/ParameterHandler",
@@ -10,6 +10,9 @@
             "email": "stof@notk.org"
         }
     ],
+    "replace": {
+        "logsafe/composer-parameter-handler": "self.version"
+    },
     "minimum-stability": "dev",
     "require": {
         "php": ">=5.3.3",
@@ -19,9 +22,9 @@
         "composer/composer": "*"
     },
     "autoload": {
-        "psr-0": { "LogSafe\\ParameterHandler": "" }
+        "psr-0": { "Incenteev\\ParameterHandler": "" }
     },
-    "target-dir": "LogSafe/ParameterHandler",
+    "target-dir": "Incenteev/ParameterHandler",
     "extra": {
         "branch-alias": {
             "dev-master": "1.0.x-dev"

@@ -15,10 +15,10 @@ Add the following in your root composer.json file:
     },
     "scripts": {
         "post-install-cmd": [
-            "LogSafe\\ParameterHandler\\ScriptHandler::buildParameters"
+            "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters"
         ],
         "post-update-cmd": [
-            "LogSafe\\ParameterHandler\\ScriptHandler::buildParameters"
+            "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters"
         ]
     },
     "extra": {
@@ -39,7 +39,7 @@ file, suffixed by ``.dist``. This can be changed in the configuration:
 ```json
 {
     "extra": {
-        "logsafe-parameters": {
+        "incenteev-parameters": {
             "file": "app/config/parameters.yml",
             "dist-file": "some/other/folder/to/other/parameters/file/parameters.yml.dist"
         }
@@ -64,7 +64,7 @@ and the parameters they should fill:
 ```json
 {
     "extra": {
-        "logsafe-parameters": {
+        "incenteev-parameters": {
             "env-map": {
                 "MY_FIRST_PARAM": "my_first_param",
                 "MY_SECOND_PARAM": "my_second_param"
