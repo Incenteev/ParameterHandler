@@ -22,7 +22,7 @@ Add the following in your root composer.json file:
         ]
     },
     "extra": {
-        "logsafe-parameters": {
+        "incenteev-parameters": {
             "file": "app/config/parameters.yml"
         }
     }
