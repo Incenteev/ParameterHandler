@@ -54,7 +54,7 @@ All prompted values are parsed as inline Yaml, to allow you to define ``true``,
 If composer is run in a non-interactive mode, the values of the dist file
 will be used for missing parameters.
 
-ATTENTION: This script remove outdated params from ``parameters.yml`` which are not in ``parameters.yml.dist``
+Warning: This script removes outdated params from ``parameters.yml`` which are not in ``parameters.yml.dist``
 If you need to keep outdated params you can use `keep-outdated` param in the configuration:
 ```json
 {
