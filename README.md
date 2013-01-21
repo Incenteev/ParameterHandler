@@ -54,6 +54,18 @@ All prompted values are parsed as inline Yaml, to allow you to define ``true``,
 If composer is run in a non-interactive mode, the values of the dist file
 will be used for missing parameters.
 
+Warning: This script removes outdated params from ``parameters.yml`` which are not in ``parameters.yml.dist``
+If you need to keep outdated params you can use `keep-outdated` param in the configuration:
+```json
+{
+    "extra": {
+        "incenteev-parameters": {
+            "keep-outdated": true,
+        }
+    }
+}
+```
+
 ## Using environment variables to set the parameters
 
 For your prod environment, using an interactive prompt may not be possible
