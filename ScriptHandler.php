@@ -26,6 +26,11 @@ class ScriptHandler
             $distFile = $extras['incenteev-parameters']['dist-file'];
         }
 
+        $keepOutdatedParams = false;
+        if (isset($extras['incenteev-parameters']['keep-outdated'])) {
+            $keepOutdatedParams = (boolean)$extras['incenteev-parameters']['keep-outdated'];
+        }
+
         if (!is_file($distFile)) {
             throw new \InvalidArgumentException(sprintf('The dist file "%s" does not exist. Check your dist-file config or create it.', $distFile));
         }
@@ -56,10 +61,12 @@ class ScriptHandler
         }
         $actualParams = (array) $actualValues['parameters'];
 
-        // Remove the outdated params
-        foreach ($actualParams as $key => $value) {
-            if (!array_key_exists($key, $expectedParams)) {
-                unset($actualParams[$key]);
+        if (!$keepOutdatedParams) {
+            // Remove the outdated params
+            foreach ($actualParams as $key => $value) {
+                if (!array_key_exists($key, $expectedParams)) {
+                    unset($actualParams[$key]);
+                }
             }
         }
 
