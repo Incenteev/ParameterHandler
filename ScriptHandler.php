@@ -83,7 +83,7 @@ class ScriptHandler
     private static function getEnvValues(array $envMap)
     {
         $params = array();
-        foreach ($envMap as $env => $param) {
+        foreach ($envMap as $param => $env) {
             $value = getenv($env);
             if ($value) {
                 $params[$param] = Inline::parse($value);

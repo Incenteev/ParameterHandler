@@ -78,8 +78,8 @@ and the parameters they should fill:
     "extra": {
         "incenteev-parameters": {
             "env-map": {
-                "MY_FIRST_PARAM": "my_first_param",
-                "MY_SECOND_PARAM": "my_second_param"
+                "my_first_param": "MY_FIRST_PARAM",
+                "my_second_param": "MY_SECOND_PARAM"
             }
         }
     }

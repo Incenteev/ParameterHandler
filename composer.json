@@ -10,13 +10,10 @@
             "email": "stof@notk.org"
         }
     ],
-    "replace": {
-        "logsafe/composer-parameter-handler": "self.version"
-    },
     "minimum-stability": "dev",
     "require": {
         "php": ">=5.3.3",
-        "symfony/yaml": ">=2.0,<2.3-dev"
+        "symfony/yaml": "~2.0"
     },
     "require-dev": {
         "composer/composer": "*"
@@ -27,7 +24,7 @@
     "target-dir": "Incenteev/ParameterHandler",
     "extra": {
         "branch-alias": {
-            "dev-master": "1.0.x-dev"
+            "dev-master": "2.0.x-dev"
         }
     }
 }
