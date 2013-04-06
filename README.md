@@ -11,7 +11,7 @@ Add the following in your root composer.json file:
 ```json
 {
     "require": {
-        "incenteev/composer-parameter-handler": "1.0.*"
+        "incenteev/composer-parameter-handler": "~2.0*"
     },
     "scripts": {
         "post-install-cmd": [
