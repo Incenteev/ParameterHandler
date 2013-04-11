@@ -113,7 +113,7 @@ class ScriptHandler
             }
 
             $default = Inline::dump($message);
-            $value = $io->ask(sprintf('<question>%s</question> (<comment>%s</comment>):', $key, $default), $default);
+            $value = $io->ask(sprintf('<question>%s</question> (<comment>%s</comment>): ', $key, $default), $default);
 
             $actualParams[$key] = Inline::parse($value);
         }
