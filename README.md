@@ -23,7 +23,9 @@ Add the following in your root composer.json file:
     },
     "extra": {
         "incenteev-parameters": {
-            "file": "app/config/parameters.yml"
+            "file": {
+                "parameters": "app/config/parameters.yml"
+            }
         }
     }
 }
@@ -40,8 +42,10 @@ file, suffixed by ``.dist``. This can be changed in the configuration:
 {
     "extra": {
         "incenteev-parameters": {
-            "file": "app/config/parameters.yml",
-            "dist-file": "some/other/folder/to/other/parameters/file/parameters.yml.dist"
+            "file": {
+                "parameters": "app/config/parameters.yml",
+                "parameters-dist": "some/other/folder/to/other/parameters/file/parameters.yml.dist"
+            }
         }
     }
 }
@@ -61,6 +65,26 @@ If you need to keep outdated params you can use `keep-outdated` param in the con
     "extra": {
         "incenteev-parameters": {
             "keep-outdated": true,
+        }
+    }
+}
+```
+
+### Multiple Files
+
+To use multiple files files the file map accepts named files. Dist files should be the designated by
+affixing ``-dist`` to the name. The script handler will organize these and loop over them to process each
+file appropriately.  
+
+```json
+{
+    "extra": {
+        "incenteev-parameters": {
+            "file": {
+                "parameters": "app/config/parameters.yml",
+                "parameters-dist": "some/other/folder/to/other/parameters/file/parameters.yml.dist",
+                "databases": "app/config/databases.yml"
+            }
         }
     }
 }

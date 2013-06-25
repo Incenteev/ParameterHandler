@@ -18,27 +18,42 @@ class ScriptHandler
             throw new \InvalidArgumentException('The extra.incenteev-parameters.file setting is required to use this script handler.');
         }
 
-        $realFile = $extras['incenteev-parameters']['file'];
+        $files = self::getFiles($extras['incenteev-parameters']['file']);
 
-        if (empty($extras['incenteev-parameters']['dist-file'])) {
-            $distFile = $realFile.'.dist';
+        foreach ($files as $file) {
+
+            self::populateFiles($file, $event);
+        }
+    }
+
+    private static function populateFiles(array $file, Event $event)
+    {
+        $extras = $event->getComposer()->getPackage()->getExtra();
+
+        $realFile = $file['file'];
+
+        if (empty($file['dist-file'])) {
+            $distFile = $realFile . '.dist';
         } else {
-            $distFile = $extras['incenteev-parameters']['dist-file'];
+            $distFile = $file['dist-file'];
         }
 
         $keepOutdatedParams = false;
         if (isset($extras['incenteev-parameters']['keep-outdated'])) {
-            $keepOutdatedParams = (boolean)$extras['incenteev-parameters']['keep-outdated'];
+            $keepOutdatedParams = (boolean) $extras['incenteev-parameters']['keep-outdated'];
         }
 
         if (!is_file($distFile)) {
-            throw new \InvalidArgumentException(sprintf('The dist file "%s" does not exist. Check your dist-file config or create it.', $distFile));
+            throw new \InvalidArgumentException(sprintf(
+                'The dist file "%s" does not exist. Check your dist-file config or create it.',
+                $distFile
+            ));
         }
 
         $exists = is_file($realFile);
 
         $yamlParser = new Parser();
-        $io = $event->getIO();
+        $io         = $event->getIO();
 
         $action = $exists ? 'Updating' : 'Creating';
         $io->write(sprintf('<info>%s the "%s" file.</info>', $action, $realFile));
@@ -55,7 +70,10 @@ class ScriptHandler
         if ($exists) {
             $existingValues = $yamlParser->parse(file_get_contents($realFile));
             if (!is_array($existingValues)) {
-                throw new \InvalidArgumentException(sprintf('The existing "%s" file does not contain an array', $realFile));
+                throw new \InvalidArgumentException(sprintf(
+                    'The existing "%s" file does not contain an array',
+                    $realFile
+                ));
             }
             $actualValues = array_merge($actualValues, $existingValues);
         }
@@ -77,7 +95,12 @@ class ScriptHandler
 
         $actualParams = self::getParams($io, $expectedParams, $actualParams);
 
-        file_put_contents($realFile, "# This file is auto-generated during the composer install\n" . Yaml::dump(array('parameters' => $actualParams)));
+        file_put_contents(
+            $realFile,
+            "# This file is auto-generated during the composer install\n" . Yaml::dump(
+                array('parameters' => $actualParams)
+            )
+        );
     }
 
     private static function getEnvValues(array $envMap)
@@ -113,11 +136,34 @@ class ScriptHandler
             }
 
             $default = Inline::dump($message);
-            $value = $io->ask(sprintf('<question>%s</question> (<comment>%s</comment>): ', $key, $default), $default);
+            $value   = $io->ask(sprintf('<question>%s</question> (<comment>%s</comment>):', $key, $default), $default);
 
             $actualParams[$key] = Inline::parse($value);
         }
 
         return $actualParams;
+    }
+
+
+    private static function getFiles(array $filesArray)
+    {
+
+        $files = array();
+        foreach (array_keys($filesArray) as $file) {
+            $isDistFile = (strpos($file, "-dist") !== false);
+            $filename   = ($isDistFile) ? substr($file, 0, strpos($file, "-dist")) : $file;
+
+            if (!isset($files[$filename])) {
+                $files[$filename] = array();
+            }
+
+            if ($isDistFile) {
+                $files[$filename]['dist-file'] = $filesArray[$file];
+            } else {
+                $files[$filename]['file'] = $filesArray[$file];
+            }
+        }
+
+        return $files;
     }
 }
