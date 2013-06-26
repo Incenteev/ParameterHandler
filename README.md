@@ -66,6 +66,26 @@ If you need to keep outdated params you can use `keep-outdated` param in the con
 }
 ```
 
+### Multiple Files
+
+To use multiple files the file map accepts named files. Dist files should be the designated by
+affixing ``-dist`` to the name. The script handler will organize these and loop over them to process each
+file appropriately.  
+
+```json
+{
+    "extra": {
+        "incenteev-parameters": {
+            "file": {
+                "parameters": "app/config/parameters.yml",
+                "parameters-dist": "some/other/folder/to/other/parameters/file/parameters.yml.dist",
+                "databases": "app/config/databases.yml"
+            }
+        }
+    }
+}
+```
+
 ## Using environment variables to set the parameters
 
 For your prod environment, using an interactive prompt may not be possible

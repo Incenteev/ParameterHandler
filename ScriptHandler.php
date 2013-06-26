@@ -18,21 +18,44 @@ class ScriptHandler
             throw new \InvalidArgumentException('The extra.incenteev-parameters.file setting is required to use this script handler.');
         }
 
-        $realFile = $extras['incenteev-parameters']['file'];
+        $filesToProcess = self::getFiles($extras['incenteev-parameters']);
 
-        if (empty($extras['incenteev-parameters']['dist-file'])) {
-            $distFile = $realFile.'.dist';
+        foreach ($filesToProcess as $files) {
+
+            self::processFiles($files, $event);
+        }
+    }
+
+    /**
+     * Reads file array and processes each file accordingly
+     *
+     * @static
+     * @param array $files
+     * @param \Composer\Script\Event $event
+     * @throws \InvalidArgumentException
+     */
+    private static function processFiles(array $files, Event $event)
+    {
+        $extras = $event->getComposer()->getPackage()->getExtra();
+
+        $realFile = $files['file'];
+
+        if (empty($files['dist-file'])) {
+            $distFile = $realFile . '.dist';
         } else {
-            $distFile = $extras['incenteev-parameters']['dist-file'];
+            $distFile = $files['dist-file'];
         }
 
         $keepOutdatedParams = false;
         if (isset($extras['incenteev-parameters']['keep-outdated'])) {
-            $keepOutdatedParams = (boolean)$extras['incenteev-parameters']['keep-outdated'];
+            $keepOutdatedParams = (boolean) $extras['incenteev-parameters']['keep-outdated'];
         }
 
         if (!is_file($distFile)) {
-            throw new \InvalidArgumentException(sprintf('The dist file "%s" does not exist. Check your dist-file config or create it.', $distFile));
+            throw new \InvalidArgumentException(sprintf(
+                'The dist file "%s" does not exist. Check your dist-file config or create it.',
+                $distFile
+            ));
         }
 
         $exists = is_file($realFile);
@@ -55,7 +78,10 @@ class ScriptHandler
         if ($exists) {
             $existingValues = $yamlParser->parse(file_get_contents($realFile));
             if (!is_array($existingValues)) {
-                throw new \InvalidArgumentException(sprintf('The existing "%s" file does not contain an array', $realFile));
+                throw new \InvalidArgumentException(sprintf(
+                    'The existing "%s" file does not contain an array',
+                    $realFile
+                ));
             }
             $actualValues = array_merge($actualValues, $existingValues);
         }
@@ -77,7 +103,12 @@ class ScriptHandler
 
         $actualParams = self::getParams($io, $expectedParams, $actualParams);
 
-        file_put_contents($realFile, "# This file is auto-generated during the composer install\n" . Yaml::dump(array('parameters' => $actualParams)));
+        file_put_contents(
+            $realFile,
+          "# This file is auto-generated during the composer install\n" . Yaml::dump(
+              array('parameters' => $actualParams)
+          )
+        );
     }
 
     private static function getEnvValues(array $envMap)
@@ -113,11 +144,53 @@ class ScriptHandler
             }
 
             $default = Inline::dump($message);
-            $value = $io->ask(sprintf('<question>%s</question> (<comment>%s</comment>): ', $key, $default), $default);
+            $value = $io->ask(sprintf('<question>%s</question> (<comment>%s</comment>):', $key, $default), $default);
 
             $actualParams[$key] = Inline::parse($value);
         }
 
         return $actualParams;
+    }
+
+    /**
+     * Allows for single or multiple files to be processed.
+     *
+     * @author Micah Breedlove <druid628@gmail.com>
+     * @static
+     * @param array $incenteevParameters
+     * @return array
+     */
+    private static function getFiles(array $incenteevParameters)
+    {
+        $files = array();
+
+        // Single File
+        if (is_string($incenteevParameters['file'])) {
+
+            $files['file']['file'] = $incenteevParameters['file'];
+            if (isset($incenteevParameters['dist-file']) && is_string($incenteevParameters['dist-file'])) {
+                $files['file']['dist-file'] = $incenteevParameters['dist-file'];
+            }
+
+            return $files;
+        }
+
+        // Multi File
+        foreach (array_keys($incenteevParameters['file']) as $file) {
+            $isDistFile = (false !== strpos($file, "-dist"));
+            $filename = $isDistFile ? substr($file, 0, strpos($file, "-dist")) : $file;
+
+            if (!isset($files[$filename])) {
+                $files[$filename] = array();
+            }
+
+            if ($isDistFile) {
+                $files[$filename]['dist-file'] = $incenteevParameters['file'][$file];
+            } else {
+                $files[$filename]['file'] = $incenteevParameters['file'][$file];
+            }
+        }
+
+        return $files;
     }
 }
