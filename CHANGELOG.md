@@ -1,6 +1,6 @@
-## 2.1.0 (2013-06-26)
+## 2.1.0
 
-* Fixes #20 - Top-level keys on the yml files other than 'parameters' were not being maintained
+* Fixes #20 - Preserve other top-level keys than ``parameters`` in the file
 
 ## 2.0.0 (2013-04-06)
 
