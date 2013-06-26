@@ -21,18 +21,16 @@ class ScriptHandler
         $realFile = $extras['incenteev-parameters']['file'];
 
         if (empty($extras['incenteev-parameters']['dist-file'])) {
-            $distFile = $realFile.'.dist';
+            $distFiles = array($realFile.'.dist');
         } else {
-            $distFile = $extras['incenteev-parameters']['dist-file'];
+            $distFiles = is_array($extras['incenteev-parameters']['dist-file'])
+                        ? $extras['incenteev-parameters']['dist-file']
+                        : array($extras['incenteev-parameters']['dist-file']);
         }
 
         $keepOutdatedParams = false;
         if (isset($extras['incenteev-parameters']['keep-outdated'])) {
             $keepOutdatedParams = (boolean)$extras['incenteev-parameters']['keep-outdated'];
-        }
-
-        if (!is_file($distFile)) {
-            throw new \InvalidArgumentException(sprintf('The dist file "%s" does not exist. Check your dist-file config or create it.', $distFile));
         }
 
         $exists = is_file($realFile);
@@ -44,11 +42,7 @@ class ScriptHandler
         $io->write(sprintf('<info>%s the "%s" file.</info>', $action, $realFile));
 
         // Find the expected params
-        $expectedValues = $yamlParser->parse(file_get_contents($distFile));
-        if (!isset($expectedValues['parameters'])) {
-            throw new \InvalidArgumentException('The dist file seems invalid.');
-        }
-        $expectedParams = (array) $expectedValues['parameters'];
+        $expectedParams = self::getExpectedParams($distFiles, $yamlParser);
 
         // find the actual params
         $actualValues = array('parameters' => array());
@@ -78,6 +72,28 @@ class ScriptHandler
         $actualParams = self::getParams($io, $expectedParams, $actualParams);
 
         file_put_contents($realFile, "# This file is auto-generated during the composer install\n" . Yaml::dump(array('parameters' => $actualParams)));
+    }
+
+    private static function getExpectedParams(array $distFiles, Parser $yamlParser)
+    {
+        $expectedParams = array();
+
+        foreach ($distFiles as $distFile) {
+            if (!is_file($distFile)) {
+                throw new \InvalidArgumentException(sprintf('The dist file "%s" does not exist. Check your dist-file config or create it.', $distFile));
+            }
+
+            $expectedValues = $yamlParser->parse(file_get_contents($distFile));
+            if (!isset($expectedValues['parameters'])) {
+                throw new \InvalidArgumentException(sprintf('The dist file %s seems invalid.', $distFile));
+            }
+            $expectedParams = array_merge(
+                $expectedParams,
+                (array) $expectedValues['parameters']
+            );
+        }
+
+        return $expectedParams;
     }
 
     private static function getEnvValues(array $envMap)
