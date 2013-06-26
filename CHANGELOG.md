@@ -1,5 +1,6 @@
 ## 2.1.0 (2013-XX-XX)
 
+* Fixes #20 - Preserve other top-level keys than ``parameters`` in the file
 * Add a rename map used to rename parameters when updating the parameters file
 * Add the possibility to use another top-level key than ``parameters``
 

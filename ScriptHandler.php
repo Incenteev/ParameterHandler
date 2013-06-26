@@ -87,7 +87,10 @@ class ScriptHandler
 
         $actualParams = self::getParams($io, $expectedParams, $actualParams);
 
-        file_put_contents($realFile, "# This file is auto-generated during the composer install\n" . Yaml::dump(array($parameterKey => $actualParams), 99));
+        // Preserve other top-level keys than `$parameterKey` in the file
+        $actualValues[$parameterKey] = $actualParams;
+
+        file_put_contents($realFile, "# This file is auto-generated during the composer install\n" . Yaml::dump($actualValues, 99));
     }
 
     private static function getEnvValues(array $envMap)
