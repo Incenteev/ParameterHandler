@@ -18,24 +18,32 @@ class ScriptHandler
             throw new \InvalidArgumentException('The extra.incenteev-parameters.file setting is required to use this script handler.');
         }
 
-        $files = self::getFiles($extras['incenteev-parameters']['file']);
+        $filesToProcess = self::getFiles($extras['incenteev-parameters']);
 
-        foreach ($files as $file) {
+        foreach ($filesToProcess as $files) {
 
-            self::populateFiles($file, $event);
+            self::processFiles($files, $event);
         }
     }
 
-    private static function populateFiles(array $file, Event $event)
+    /**
+     * Reads file array and processes each file accordingly
+     *
+     * @static
+     * @param array $files
+     * @param \Composer\Script\Event $event
+     * @throws \InvalidArgumentException
+     */
+    private static function processFiles(array $files, Event $event)
     {
         $extras = $event->getComposer()->getPackage()->getExtra();
 
-        $realFile = $file['file'];
+        $realFile = $files['file'];
 
-        if (empty($file['dist-file'])) {
+        if (empty($files['dist-file'])) {
             $distFile = $realFile . '.dist';
         } else {
-            $distFile = $file['dist-file'];
+            $distFile = $files['dist-file'];
         }
 
         $keepOutdatedParams = false;
@@ -53,7 +61,7 @@ class ScriptHandler
         $exists = is_file($realFile);
 
         $yamlParser = new Parser();
-        $io         = $event->getIO();
+        $io = $event->getIO();
 
         $action = $exists ? 'Updating' : 'Creating';
         $io->write(sprintf('<info>%s the "%s" file.</info>', $action, $realFile));
@@ -97,9 +105,9 @@ class ScriptHandler
 
         file_put_contents(
             $realFile,
-            "# This file is auto-generated during the composer install\n" . Yaml::dump(
-                array('parameters' => $actualParams)
-            )
+          "# This file is auto-generated during the composer install\n" . Yaml::dump(
+              array('parameters' => $actualParams)
+          )
         );
     }
 
@@ -136,7 +144,7 @@ class ScriptHandler
             }
 
             $default = Inline::dump($message);
-            $value   = $io->ask(sprintf('<question>%s</question> (<comment>%s</comment>):', $key, $default), $default);
+            $value = $io->ask(sprintf('<question>%s</question> (<comment>%s</comment>):', $key, $default), $default);
 
             $actualParams[$key] = Inline::parse($value);
         }
@@ -144,23 +152,42 @@ class ScriptHandler
         return $actualParams;
     }
 
-
-    private static function getFiles(array $filesArray)
+    /**
+     * Allows for single or multiple files to be processed.
+     *
+     * @author Micah Breedlove <druid628@gmail.com>
+     * @static
+     * @param array $incenteevParameters
+     * @return array
+     */
+    private static function getFiles(array $incenteevParameters)
     {
-
         $files = array();
-        foreach (array_keys($filesArray) as $file) {
-            $isDistFile = (strpos($file, "-dist") !== false);
-            $filename   = ($isDistFile) ? substr($file, 0, strpos($file, "-dist")) : $file;
+
+        // Single File
+        if (is_string($incenteevParameters['file'])) {
+
+            $files['file']['file'] = $incenteevParameters['file'];
+            if (isset($incenteevParameters['dist-file']) && is_string($incenteevParameters['dist-file'])) {
+                $files['file']['dist-file'] = $incenteevParameters['dist-file'];
+            }
+
+            return $files;
+        }
+
+        // Multi File
+        foreach (array_keys($incenteevParameters['file']) as $file) {
+            $isDistFile = (false !== strpos($file, "-dist"));
+            $filename = $isDistFile ? substr($file, 0, strpos($file, "-dist")) : $file;
 
             if (!isset($files[$filename])) {
                 $files[$filename] = array();
             }
 
             if ($isDistFile) {
-                $files[$filename]['dist-file'] = $filesArray[$file];
+                $files[$filename]['dist-file'] = $incenteevParameters['file'][$file];
             } else {
-                $files[$filename]['file'] = $filesArray[$file];
+                $files[$filename]['file'] = $incenteevParameters['file'][$file];
             }
         }
 
