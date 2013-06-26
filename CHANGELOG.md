@@ -1,3 +1,8 @@
+## 2.0.1 (2013-06-26)
+
+* Fixes #20 - Top-level keys on the yml files other than 'parameters' were not being maintained
++ Added CONTRIBUTORS.md
+
 ## 2.0.0 (2013-04-06)
 
 * BC BREAK the env map has been changed, inverting the keys and the values. Refs #14

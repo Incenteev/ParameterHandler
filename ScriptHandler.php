@@ -58,6 +58,8 @@ class ScriptHandler
                 throw new \InvalidArgumentException(sprintf('The existing "%s" file does not contain an array', $realFile));
             }
             $actualValues = array_merge($actualValues, $existingValues);
+        } else {
+            $existingValues = array();
         }
         $actualParams = (array) $actualValues['parameters'];
 
@@ -77,7 +79,11 @@ class ScriptHandler
 
         $actualParams = self::getParams($io, $expectedParams, $actualParams);
 
-        file_put_contents($realFile, "# This file is auto-generated during the composer install\n" . Yaml::dump(array('parameters' => $actualParams)));
+        // Keep existing top-level keys and override parameters with the new values
+        $newValues = $existingValues;
+        $newValues['parameters'] = $actualParams;
+
+        file_put_contents($realFile, "# This file is auto-generated during the composer install\n" . Yaml::dump($newValues));
     }
 
     private static function getEnvValues(array $envMap)
