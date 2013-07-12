@@ -66,6 +66,17 @@ If you need to keep outdated params you can use `keep-outdated` param in the con
 }
 ```
 
+The script handler looks for a ``parameters`` key in your dist file.  You can change this by using the `parameter-key` param in the configuration:
+```json
+{
+    "extra": {
+        "incenteev-parameters": {
+            "parameter-key": "config"
+        }
+    }
+}
+```
+
 ## Using environment variables to set the parameters
 
 For your prod environment, using an interactive prompt may not be possible
