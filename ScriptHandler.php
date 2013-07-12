@@ -31,6 +31,12 @@ class ScriptHandler
             $keepOutdatedParams = (boolean)$extras['incenteev-parameters']['keep-outdated'];
         }
 
+        if (empty($extras['incenteev-parameters']['parameter-key'])) {
+            $parameterKey = 'parameters';
+        } else {
+            $parameterKey = $extras['incenteev-parameters']['parameter-key'];
+        }
+
         if (!is_file($distFile)) {
             throw new \InvalidArgumentException(sprintf('The dist file "%s" does not exist. Check your dist-file config or create it.', $distFile));
         }
@@ -45,13 +51,13 @@ class ScriptHandler
 
         // Find the expected params
         $expectedValues = $yamlParser->parse(file_get_contents($distFile));
-        if (!isset($expectedValues['parameters'])) {
+        if (!isset($expectedValues[$parameterKey])) {
             throw new \InvalidArgumentException('The dist file seems invalid.');
         }
-        $expectedParams = (array) $expectedValues['parameters'];
+        $expectedParams = (array) $expectedValues[$parameterKey];
 
         // find the actual params
-        $actualValues = array('parameters' => array());
+        $actualValues = array($parameterKey => array());
         if ($exists) {
             $existingValues = $yamlParser->parse(file_get_contents($realFile));
             if (!is_array($existingValues)) {
@@ -59,7 +65,7 @@ class ScriptHandler
             }
             $actualValues = array_merge($actualValues, $existingValues);
         }
-        $actualParams = (array) $actualValues['parameters'];
+        $actualParams = (array) $actualValues[$parameterKey];
 
         if (!$keepOutdatedParams) {
             // Remove the outdated params
@@ -77,7 +83,7 @@ class ScriptHandler
 
         $actualParams = self::getParams($io, $expectedParams, $actualParams);
 
-        file_put_contents($realFile, "# This file is auto-generated during the composer install\n" . Yaml::dump(array('parameters' => $actualParams)));
+        file_put_contents($realFile, "# This file is auto-generated during the composer install\n" . Yaml::dump(array($parameterKey => $actualParams)));
     }
 
     private static function getEnvValues(array $envMap)
