@@ -66,7 +66,8 @@ If you need to keep outdated params you can use `keep-outdated` param in the con
 }
 ```
 
-The script handler looks for a ``parameters`` key in your dist file.  You can change this by using the `parameter-key` param in the configuration:
+The script handler looks for a ``parameters`` key in your dist file.  You can change this by using the
+`parameter-key` param in the configuration:
 ```json
 {
     "extra": {
