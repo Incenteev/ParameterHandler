@@ -67,6 +67,10 @@ class ScriptHandler
         }
         $actualParams = (array) $actualValues[$parameterKey];
 
+        // Grab values for parameters that were renamed
+        $renameMap = empty($extras['incenteev-parameters']['rename-map']) ? array() : (array) $extras['incenteev-parameters']['rename-map'];
+        $actualParams = array_replace($actualParams, self::getRenameValues($renameMap, $actualParams));
+
         if (!$keepOutdatedParams) {
             // Remove the outdated params
             foreach ($actualParams as $key => $value) {
@@ -93,6 +97,26 @@ class ScriptHandler
             $value = getenv($env);
             if ($value) {
                 $params[$param] = Inline::parse($value);
+            }
+        }
+
+        return $params;
+    }
+
+    private static function getRenameValues(array $renameMap, $actualParams)
+    {
+        $params = array();
+        foreach ($renameMap as $param => $oldParam) {
+            if (array_key_exists($param, $actualParams)) {
+                continue;
+            }
+
+            if (!array_key_exists($oldParam, $actualParams)) {
+                continue;
+            }
+
+            if ($actualParams[$oldParam]) {
+                $params[$param] = $actualParams[$oldParam];
             }
         }
 
