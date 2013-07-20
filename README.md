@@ -105,6 +105,33 @@ As environment variables can only be strings, they are also parsed as inline
 Yaml values to allows specifying ``null``, ``false``, ``true`` or numbers
 easily.
 
+## Renaming parameters
+
+If you are renaming a parameter, the new key will be set according to the usual
+routine (prompt if possible, use environment variables, use default).
+To have the parameters handler use the value of an (obsolete) parameter, specify
+a rename-map:
+```json
+{
+    "extra": {
+        "incenteev-parameters": {
+            "rename-map": {
+                "new_param_1": "old_param_1",
+                "new_param_2": "old_param_2"
+            }
+        }
+    }
+}
+```
+
+This will create the new parameters new_param_1 and new_param_2 while using the
+values from old_param_1 and old_param_2, respectively. It will not remove the
+old parameters unless you've also removed them from the dist version.
+
+If the old parameter is no longer present (maybe because it has been renamed and
+removed already), no parameters are overwritten. You don't need to remove obsolete
+parameters from the rename map once they have been renamed.
+
 Warning: This parameters handler will overwrite any comments or spaces into
 your parameters.yml file so handle with care. So if you want to give format
 and comments to your parameter's file you should do it on your dist version.
