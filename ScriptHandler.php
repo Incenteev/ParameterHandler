@@ -39,32 +39,10 @@ class ScriptHandler
 
     private static function processFile(array $config, IOInterface $io)
     {
-        if (empty($config['file'])) {
-            throw new \InvalidArgumentException('The extra.incenteev-parameters.file setting is required to use this script handler.');
-        }
+        $config = self::processConfig($config);
 
         $realFile = $config['file'];
-
-        if (empty($config['dist-file'])) {
-            $distFile = $realFile.'.dist';
-        } else {
-            $distFile = $config['dist-file'];
-        }
-
-        $keepOutdatedParams = false;
-        if (isset($config['keep-outdated'])) {
-            $keepOutdatedParams = (boolean) $config['keep-outdated'];
-        }
-
-        if (empty($config['parameter-key'])) {
-            $parameterKey = 'parameters';
-        } else {
-            $parameterKey = $config['parameter-key'];
-        }
-
-        if (!is_file($distFile)) {
-            throw new \InvalidArgumentException(sprintf('The dist file "%s" does not exist. Check your dist-file config or create it.', $distFile));
-        }
+        $parameterKey = $config['parameter-key'];
 
         $exists = is_file($realFile);
 
@@ -74,7 +52,7 @@ class ScriptHandler
         $io->write(sprintf('<info>%s the "%s" file.</info>', $action, $realFile));
 
         // Find the expected params
-        $expectedValues = $yamlParser->parse(file_get_contents($distFile));
+        $expectedValues = $yamlParser->parse(file_get_contents($config['dist-file']));
         if (!isset($expectedValues[$parameterKey])) {
             throw new \InvalidArgumentException('The dist file seems invalid.');
         }
@@ -89,11 +67,54 @@ class ScriptHandler
             }
             $actualValues = array_merge($actualValues, $existingValues);
         }
-        $actualParams = (array) $actualValues[$parameterKey];
 
+        $actualValues[$parameterKey] = self::processParams($config, $io, $expectedParams, (array) $actualValues[$parameterKey]);
+
+        // Preserve other top-level keys than `$parameterKey` in the file
+        foreach ($expectedValues as $key => $setting) {
+            if (!array_key_exists($key, $actualValues)) {
+                $actualValues[$key] = $setting;
+            }
+        }
+
+        if (!is_dir($dir = dirname($realFile))) {
+            mkdir($dir, 0755, true);
+        }
+
+        file_put_contents($realFile, "# This file is auto-generated during the composer install\n" . Yaml::dump($actualValues, 99));
+    }
+
+    private static function processConfig(array $config)
+    {
+        if (empty($config['file'])) {
+            throw new \InvalidArgumentException('The extra.incenteev-parameters.file setting is required to use this script handler.');
+        }
+
+        if (empty($config['dist-file'])) {
+            $config['dist-file'] = $config['file'].'.dist';
+        }
+
+        if (!is_file($config['dist-file'])) {
+            throw new \InvalidArgumentException(sprintf('The dist file "%s" does not exist. Check your dist-file config or create it.', $config['dist-file']));
+        }
+
+        if (empty($config['parameter-key'])) {
+            $config['parameter-key'] = 'parameters';
+        }
+
+        return $config;
+    }
+
+    private static function processParams(array $config, IOInterface $io, $expectedParams, $actualParams)
+    {
         // Grab values for parameters that were renamed
         $renameMap = empty($config['rename-map']) ? array() : (array) $config['rename-map'];
         $actualParams = array_replace($actualParams, self::getRenameValues($renameMap, $actualParams));
+
+        $keepOutdatedParams = false;
+        if (isset($config['keep-outdated'])) {
+            $keepOutdatedParams = (boolean) $config['keep-outdated'];
+        }
 
         if (!$keepOutdatedParams) {
             // Remove the outdated params
@@ -109,21 +130,7 @@ class ScriptHandler
         // Add the params coming from the environment values
         $actualParams = array_replace($actualParams, self::getEnvValues($envMap));
 
-        $actualParams = self::getParams($io, $expectedParams, $actualParams);
-
-        // Preserve other top-level keys than `$parameterKey` in the file
-        $actualValues[$parameterKey] = $actualParams;
-        foreach ($expectedValues as $key => $setting) {
-            if (!array_key_exists($key, $actualValues)) {
-                $actualValues[$key] = $setting;
-            }
-        }
-
-        if (!is_dir($dir = dirname($realFile))) {
-            mkdir($dir, 0755, true);
-        }
-
-        file_put_contents($realFile, "# This file is auto-generated during the composer install\n" . Yaml::dump($actualValues, 99));
+        return self::getParams($io, $expectedParams, $actualParams);
     }
 
     private static function getEnvValues(array $envMap)
