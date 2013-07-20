@@ -2,7 +2,8 @@
 
 This tool allows you to manage your ignored parameters when running a composer
 install or update. It works when storing the parameters in a Yaml file under
-a ``parameters`` key.
+a a single top-level key (named ``parameters`` by default). Other keys are
+copied without change.
 
 ## Usage
 
