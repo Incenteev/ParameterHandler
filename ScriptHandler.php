@@ -14,27 +14,52 @@ class ScriptHandler
     {
         $extras = $event->getComposer()->getPackage()->getExtra();
 
-        if (empty($extras['incenteev-parameters']['file'])) {
+        if (!isset($extras['incenteev-parameters'])) {
+            throw new \InvalidArgumentException('The parameter handler needs to be configured through the extra.incenteev-parameters setting.');
+        }
+
+        $configs = $extras['incenteev-parameters'];
+
+        if (!is_array($configs)) {
+            throw new \InvalidArgumentException('The extra.incenteev-parameters setting must be an array or a configuration object.');
+        }
+
+        if (array_keys($configs) !== range(0, count($configs) - 1)) {
+            $configs = array($configs);
+        }
+
+        foreach ($configs as $config) {
+            if (!is_array($config)) {
+                throw new \InvalidArgumentException('The extra.incenteev-parameters setting must be an array of configuration objects.');
+            }
+
+            self::processFile($config, $event->getIO());
+        }
+    }
+
+    private static function processFile(array $config, IOInterface $io)
+    {
+        if (empty($config['file'])) {
             throw new \InvalidArgumentException('The extra.incenteev-parameters.file setting is required to use this script handler.');
         }
 
-        $realFile = $extras['incenteev-parameters']['file'];
+        $realFile = $config['file'];
 
-        if (empty($extras['incenteev-parameters']['dist-file'])) {
+        if (empty($config['dist-file'])) {
             $distFile = $realFile.'.dist';
         } else {
-            $distFile = $extras['incenteev-parameters']['dist-file'];
+            $distFile = $config['dist-file'];
         }
 
         $keepOutdatedParams = false;
-        if (isset($extras['incenteev-parameters']['keep-outdated'])) {
-            $keepOutdatedParams = (boolean)$extras['incenteev-parameters']['keep-outdated'];
+        if (isset($config['keep-outdated'])) {
+            $keepOutdatedParams = (boolean) $config['keep-outdated'];
         }
 
-        if (empty($extras['incenteev-parameters']['parameter-key'])) {
+        if (empty($config['parameter-key'])) {
             $parameterKey = 'parameters';
         } else {
-            $parameterKey = $extras['incenteev-parameters']['parameter-key'];
+            $parameterKey = $config['parameter-key'];
         }
 
         if (!is_file($distFile)) {
@@ -44,7 +69,6 @@ class ScriptHandler
         $exists = is_file($realFile);
 
         $yamlParser = new Parser();
-        $io = $event->getIO();
 
         $action = $exists ? 'Updating' : 'Creating';
         $io->write(sprintf('<info>%s the "%s" file.</info>', $action, $realFile));
@@ -68,7 +92,7 @@ class ScriptHandler
         $actualParams = (array) $actualValues[$parameterKey];
 
         // Grab values for parameters that were renamed
-        $renameMap = empty($extras['incenteev-parameters']['rename-map']) ? array() : (array) $extras['incenteev-parameters']['rename-map'];
+        $renameMap = empty($config['rename-map']) ? array() : (array) $config['rename-map'];
         $actualParams = array_replace($actualParams, self::getRenameValues($renameMap, $actualParams));
 
         if (!$keepOutdatedParams) {
@@ -80,7 +104,7 @@ class ScriptHandler
             }
         }
 
-        $envMap = empty($extras['incenteev-parameters']['env-map']) ? array() : (array) $extras['incenteev-parameters']['env-map'];
+        $envMap = empty($config['env-map']) ? array() : (array) $config['env-map'];
 
         // Add the params coming from the environment values
         $actualParams = array_replace($actualParams, self::getEnvValues($envMap));

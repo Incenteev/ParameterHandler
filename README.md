@@ -141,3 +141,27 @@ old parameters unless you've also removed them from the dist version.
 If the old parameter is no longer present (maybe because it has been renamed and
 removed already), no parameters are overwritten. You don't need to remove obsolete
 parameters from the rename map once they have been renamed.
+
+### Managing multiple ignored files
+
+The parameter handler can manage multiple ignored files. To use this feature,
+the ``incenteev-parameters`` extra should contain a JSON array with multiple
+configurations inside it instead of a configuration object:
+
+```json
+{
+    "extra": {
+        "incenteev-parameters": [
+            {
+                "file": "app/config/parameters.yml",
+                "env-map": {}
+            },
+            {
+                "file": "app/config/databases.yml",
+                "dist-file": "app/config/databases.dist.yml",
+                "parameter-key": "config"
+            }
+        ]
+    }
+}
+```

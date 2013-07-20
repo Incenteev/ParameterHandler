@@ -61,11 +61,15 @@ class ScriptHandlerTest extends ProphecyTestCase
         return array(
             'no extra' => array(
                 array(),
-                'The extra.incenteev-parameters.file setting is required to use this script handler.',
+                'The parameter handler needs to be configured through the extra.incenteev-parameters setting.',
             ),
             'invalid type' => array(
                 array('incenteev-parameters' => 'not an array'),
-                'The extra.incenteev-parameters.file setting is required to use this script handler.',
+                'The extra.incenteev-parameters setting must be an array or a configuration object.',
+            ),
+            'invalid type for multiple file' => array(
+                array('incenteev-parameters' => array('not an array')),
+                'The extra.incenteev-parameters setting must be an array of configuration objects.',
             ),
             'no file' => array(
                 array('incenteev-parameters' => array()),
