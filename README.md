@@ -5,6 +5,10 @@ install or update. It works when storing the parameters in a Yaml file under
 a a single top-level key (named ``parameters`` by default). Other keys are
 copied without change.
 
+[![Build Status](https://travis-ci.org/Incenteev/ParameterHandler.png)](https://travis-ci.org/Incenteev/ParameterHandler)
+[![Latest Stable Version](https://poser.pugx.org/incenteev/composer-parameter-handler/v/stable.png)](https://packagist.org/packages/incenteev/composer-parameter-handler)
+[![Latest Unstable Version](https://poser.pugx.org/incenteev/composer-parameter-handler/v/unstable.png)](https://packagist.org/packages/incenteev/composer-parameter-handler)
+
 ## Usage
 
 Add the following in your root composer.json file:
