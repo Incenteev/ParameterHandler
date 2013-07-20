@@ -1,6 +1,7 @@
-## 2.0.1
+## 2.1.0 (2013-XX-XX)
 
 * Add a rename map used to rename parameters when updating the parameters file
+* Add the possibility to use another top-level key than ``parameters``
 
 ## 2.0.0 (2013-04-06)
 
