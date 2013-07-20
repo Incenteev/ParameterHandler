@@ -10,13 +10,14 @@
             "email": "stof@notk.org"
         }
     ],
-    "minimum-stability": "dev",
     "require": {
         "php": ">=5.3.3",
         "symfony/yaml": "~2.0"
     },
     "require-dev": {
-        "composer/composer": "*"
+        "composer/composer": "1.0.*@dev",
+        "phpspec/prophecy-phpunit": "~1.0",
+        "symfony/filesystem": "~2.2"
     },
     "autoload": {
         "psr-0": { "Incenteev\\ParameterHandler": "" }
