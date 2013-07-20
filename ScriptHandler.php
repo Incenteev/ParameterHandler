@@ -109,7 +109,7 @@ class ScriptHandler
     {
         // Grab values for parameters that were renamed
         $renameMap = empty($config['rename-map']) ? array() : (array) $config['rename-map'];
-        $actualParams = array_replace($actualParams, self::getRenameValues($renameMap, $actualParams));
+        $actualParams = array_replace($actualParams, self::processRenamedValues($renameMap, $actualParams));
 
         $keepOutdatedParams = false;
         if (isset($config['keep-outdated'])) {
@@ -146,7 +146,7 @@ class ScriptHandler
         return $params;
     }
 
-    private static function getRenameValues(array $renameMap, array $actualParams)
+    private static function processRenamedValues(array $renameMap, array $actualParams)
     {
         foreach ($renameMap as $param => $oldParam) {
             if (array_key_exists($param, $actualParams)) {
