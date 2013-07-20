@@ -95,6 +95,10 @@ class ScriptHandler
             }
         }
 
+        if (!is_dir($dir = dirname($realFile))) {
+            mkdir($dir, 0755, true);
+        }
+
         file_put_contents($realFile, "# This file is auto-generated during the composer install\n" . Yaml::dump($actualValues, 99));
     }
 
