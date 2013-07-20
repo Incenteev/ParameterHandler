@@ -54,8 +54,11 @@ All prompted values are parsed as inline Yaml, to allow you to define ``true``,
 If composer is run in a non-interactive mode, the values of the dist file
 will be used for missing parameters.
 
+### Keeping outdated parameters
+
 Warning: This script removes outdated params from ``parameters.yml`` which are not in ``parameters.yml.dist``
 If you need to keep outdated params you can use `keep-outdated` param in the configuration:
+
 ```json
 {
     "extra": {
@@ -65,6 +68,8 @@ If you need to keep outdated params you can use `keep-outdated` param in the con
     }
 }
 ```
+
+### Using a different top-level key
 
 The script handler looks for a ``parameters`` key in your dist file.  You can change this by using the
 `parameter-key` param in the configuration:
@@ -78,7 +83,7 @@ The script handler looks for a ``parameters`` key in your dist file.  You can ch
 }
 ```
 
-## Using environment variables to set the parameters
+### Using environment variables to set the parameters
 
 For your prod environment, using an interactive prompt may not be possible
 when deploying. In this case, you can rely on environment variables to provide
@@ -105,7 +110,7 @@ As environment variables can only be strings, they are also parsed as inline
 Yaml values to allows specifying ``null``, ``false``, ``true`` or numbers
 easily.
 
-## Renaming parameters
+### Renaming parameters
 
 If you are renaming a parameter, the new key will be set according to the usual
 routine (prompt if possible, use environment variables, use default).
