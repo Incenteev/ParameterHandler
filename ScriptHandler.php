@@ -113,7 +113,6 @@ class ScriptHandler
 
     private static function getRenameValues(array $renameMap, array $actualParams)
     {
-        $params = array();
         foreach ($renameMap as $param => $oldParam) {
             if (array_key_exists($param, $actualParams)) {
                 continue;
@@ -123,10 +122,10 @@ class ScriptHandler
                 continue;
             }
 
-            $params[$param] = $actualParams[$oldParam];
+            $actualParams[$param] = $actualParams[$oldParam];
         }
 
-        return $params;
+        return $actualParams;
     }
 
     private static function getParams(IOInterface $io, array $expectedParams, array $actualParams)
