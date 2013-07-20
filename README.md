@@ -129,7 +129,7 @@ values from old_param_1 and old_param_2, respectively. It will not remove the
 old parameters unless you've also removed them from the dist version.
 
 If the old parameter is no longer present (maybe because it has been renamed and
-remove already), no parameters are overwritten. You don't need to remove obsolete
+removed already), no parameters are overwritten. You don't need to remove obsolete
 parameters from the rename map once they have been renamed.
 
 Warning: This parameters handler will overwrite any comments or spaces into
