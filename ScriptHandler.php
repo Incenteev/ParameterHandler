@@ -89,6 +89,11 @@ class ScriptHandler
 
         // Preserve other top-level keys than `$parameterKey` in the file
         $actualValues[$parameterKey] = $actualParams;
+        foreach ($expectedValues as $key => $setting) {
+            if (!array_key_exists($key, $actualValues)) {
+                $actualValues[$key] = $setting;
+            }
+        }
 
         file_put_contents($realFile, "# This file is auto-generated during the composer install\n" . Yaml::dump($actualValues, 99));
     }
