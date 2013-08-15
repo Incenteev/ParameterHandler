@@ -49,7 +49,7 @@ class ScriptHandler
         $yamlParser = new Parser();
 
         $action = $exists ? 'Updating' : 'Creating';
-        $io->write(sprintf('<info>%s the "%s" file.</info>', $action, $realFile));
+        $io->write(sprintf('<info>%s the "%s" file</info>', $action, $realFile));
 
         // Find the expected params
         $expectedValues = $yamlParser->parse(file_get_contents($config['dist-file']));
