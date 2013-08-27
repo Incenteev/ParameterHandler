@@ -128,7 +128,7 @@ class ScriptHandlerTest extends ProphecyTestCase
 
         $this->package->getExtra()->willReturn(array('incenteev-parameters' => $testCase['config']));
 
-        $message = sprintf('<info>%s the "%s" file.</info>', $exists ? 'Updating' : 'Creating', $testCase['config']['file']);
+        $message = sprintf('<info>%s the "%s" file</info>', $exists ? 'Updating' : 'Creating', $testCase['config']['file']);
         $this->io->write($message)->shouldBeCalled();
 
         $this->setInteractionExpectations($testCase);
