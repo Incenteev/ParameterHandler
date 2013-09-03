@@ -72,7 +72,7 @@ If you need to keep outdated params you can use `keep-outdated` param in the con
 {
     "extra": {
         "incenteev-parameters": {
-            "keep-outdated": true,
+            "keep-outdated": true
         }
     }
 }
