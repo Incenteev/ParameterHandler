@@ -14,13 +14,14 @@
             "email": "piotr.pasich@xsolve.pl"
         }
     ],
-    "minimum-stability": "dev",
     "require": {
         "php": ">=5.3.3",
         "symfony/yaml": "~2.0"
     },
     "require-dev": {
-        "composer/composer": "*"
+        "composer/composer": "1.0.*@dev",
+        "phpspec/prophecy-phpunit": "~1.0",
+        "symfony/filesystem": "~2.2"
     },
     "autoload": {
         "psr-0": { "Incenteev\\ParameterHandler": "" }
@@ -28,7 +29,7 @@
     "target-dir": "Incenteev/ParameterHandler",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.0.x-dev"
+            "dev-master": "2.1.x-dev"
         }
     }
 }

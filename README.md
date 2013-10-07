@@ -2,7 +2,12 @@
 
 This tool allows you to manage your ignored parameters when running a composer
 install or update. It works when storing the parameters in a Yaml file under
-a ``parameters`` key.
+a a single top-level key (named ``parameters`` by default). Other keys are
+copied without change.
+
+[![Build Status](https://travis-ci.org/Incenteev/ParameterHandler.png)](https://travis-ci.org/Incenteev/ParameterHandler)
+[![Latest Stable Version](https://poser.pugx.org/incenteev/composer-parameter-handler/v/stable.png)](https://packagist.org/packages/incenteev/composer-parameter-handler)
+[![Latest Unstable Version](https://poser.pugx.org/incenteev/composer-parameter-handler/v/unstable.png)](https://packagist.org/packages/incenteev/composer-parameter-handler)
 
 ## Usage
 
@@ -11,7 +16,7 @@ Add the following in your root composer.json file:
 ```json
 {
     "require": {
-        "incenteev/composer-parameter-handler": "1.0.*"
+        "incenteev/composer-parameter-handler": "~2.0"
     },
     "scripts": {
         "post-install-cmd": [
@@ -55,19 +60,40 @@ All prompted values are parsed as inline Yaml, to allow you to define ``true``,
 If composer is run in a non-interactive mode, the values of the dist file
 will be used for missing parameters.
 
+**Warning:** This parameters handler will overwrite any comments or spaces into
+your parameters.yml file so handle with care. So if you want to give format
+and comments to your parameter's file you should do it on your dist version.
+
+### Keeping outdated parameters
+
 Warning: This script removes outdated params from ``parameters.yml`` which are not in ``parameters.yml.dist``
 If you need to keep outdated params you can use `keep-outdated` param in the configuration:
+
 ```json
 {
     "extra": {
         "incenteev-parameters": {
-            "keep-outdated": true,
+            "keep-outdated": true
         }
     }
 }
 ```
 
-## Using environment variables to set the parameters
+### Using a different top-level key
+
+The script handler looks for a ``parameters`` key in your dist file.  You can change this by using the
+`parameter-key` param in the configuration:
+```json
+{
+    "extra": {
+        "incenteev-parameters": {
+            "parameter-key": "config"
+        }
+    }
+}
+```
+
+### Using environment variables to set the parameters
 
 For your prod environment, using an interactive prompt may not be possible
 when deploying. In this case, you can rely on environment variables to provide
@@ -94,6 +120,53 @@ As environment variables can only be strings, they are also parsed as inline
 Yaml values to allows specifying ``null``, ``false``, ``true`` or numbers
 easily.
 
-Warning: This parameters handler will overwrite any comments or spaces into
-your parameters.yml file so handle with care. So if you want to give format
-and comments to your parameter's file you should do it on your dist version.
+### Renaming parameters
+
+If you are renaming a parameter, the new key will be set according to the usual
+routine (prompt if possible, use environment variables, use default).
+To have the parameters handler use the value of an (obsolete) parameter, specify
+a rename-map:
+```json
+{
+    "extra": {
+        "incenteev-parameters": {
+            "rename-map": {
+                "new_param_1": "old_param_1",
+                "new_param_2": "old_param_2"
+            }
+        }
+    }
+}
+```
+
+This will create the new parameters new_param_1 and new_param_2 while using the
+values from old_param_1 and old_param_2, respectively. It will not remove the
+old parameters unless you've also removed them from the dist version.
+
+If the old parameter is no longer present (maybe because it has been renamed and
+removed already), no parameters are overwritten. You don't need to remove obsolete
+parameters from the rename map once they have been renamed.
+
+### Managing multiple ignored files
+
+The parameter handler can manage multiple ignored files. To use this feature,
+the ``incenteev-parameters`` extra should contain a JSON array with multiple
+configurations inside it instead of a configuration object:
+
+```json
+{
+    "extra": {
+        "incenteev-parameters": [
+            {
+                "file": "app/config/parameters.yml",
+                "env-map": {}
+            },
+            {
+                "file": "app/config/databases.yml",
+                "dist-file": "app/config/databases.dist.yml",
+                "parameter-key": "config"
+            }
+        ]
+    }
+}
+```

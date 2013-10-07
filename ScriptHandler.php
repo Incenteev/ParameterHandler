@@ -14,57 +14,111 @@ class ScriptHandler
     {
         $extras = $event->getComposer()->getPackage()->getExtra();
 
-        if (empty($extras['incenteev-parameters']['file'])) {
-            throw new \InvalidArgumentException('The extra.incenteev-parameters.file setting is required to use this script handler.');
+        if (!isset($extras['incenteev-parameters'])) {
+            throw new \InvalidArgumentException('The parameter handler needs to be configured through the extra.incenteev-parameters setting.');
         }
 
-        $realFile = $extras['incenteev-parameters']['file'];
+        $configs = $extras['incenteev-parameters'];
 
-        if (empty($extras['incenteev-parameters']['dist-file'])) {
-            $distFile = $realFile.'.dist';
-        } else {
-            $distFile = $extras['incenteev-parameters']['dist-file'];
+        if (!is_array($configs)) {
+            throw new \InvalidArgumentException('The extra.incenteev-parameters setting must be an array or a configuration object.');
         }
 
-        $keepOutdatedParams = false;
-        if (isset($extras['incenteev-parameters']['keep-outdated'])) {
-            $keepOutdatedParams = (boolean)$extras['incenteev-parameters']['keep-outdated'];
+        if (array_keys($configs) !== range(0, count($configs) - 1)) {
+            $configs = array($configs);
         }
 
-        if (!is_file($distFile)) {
-            throw new \InvalidArgumentException(sprintf('The dist file "%s" does not exist. Check your dist-file config or create it.', $distFile));
+        foreach ($configs as $config) {
+            if (!is_array($config)) {
+                throw new \InvalidArgumentException('The extra.incenteev-parameters setting must be an array of configuration objects.');
+            }
+
+            self::processFile($config, $event->getIO());
         }
+    }
+
+    private static function processFile(array $config, IOInterface $io)
+    {
+        $config = self::processConfig($config);
+
+        $realFile = $config['file'];
+        $parameterKey = $config['parameter-key'];
 
         $exists = is_file($realFile);
 
         $yamlParser = new Parser();
-        $io = $event->getIO();
 
         $action = $exists ? 'Updating' : 'Creating';
-        $io->write(sprintf('<info>%s the "%s" file.</info>', $action, $realFile));
+        $io->write(sprintf('<info>%s the "%s" file</info>', $action, $realFile));
 
         // Find the expected params
+
         $parametersDistFiles = self::getVendorsParametersDistFiles();
         $expectedValues = array();
         foreach ($parametersDistFiles as $singleParameterFile) {
             $expectedValues = array_merge($expectedValues, self::loadParameterFile($singleParameterFile));
         }
         $parametersDistGlobal = $yamlParser->parse(file_get_contents($distFile));
-        $expectedValues = array('parameters'=> array_merge($expectedValues['parameters'], $parametersDistGlobal['parameters']));
+        $expectedValues = array($parameterKey=> array_merge($expectedValues[$parameterKey], $parametersDistGlobal[$parameterKey]));
 
-        if (!isset($expectedValues['parameters'])) {
+        if (!isset($expectedValues[$parameterKey])) {
             throw new \InvalidArgumentException('The dist file seems invalid.');
         }
-        $expectedParams = (array) $expectedValues['parameters'];
+        $expectedParams = (array) $expectedValues[$parameterKey];
 
-        // find the actual params
-        $actualValues = array('parameters' => array());
-
+        $actualValues = array($parameterKey => array());
         if ($exists) {
             $existingValues = self::loadParameterFile($realFile);
             $actualValues = array_merge($actualValues, $existingValues);
         }
-        $actualParams = (array) $actualValues['parameters'];
+
+        $actualValues[$parameterKey] = self::processParams($config, $io, $expectedParams, (array) $actualValues[$parameterKey]);
+
+        // Preserve other top-level keys than `$parameterKey` in the file
+        foreach ($expectedValues as $key => $setting) {
+            if (!array_key_exists($key, $actualValues)) {
+                $actualValues[$key] = $setting;
+            }
+        }
+
+        if (!is_dir($dir = dirname($realFile))) {
+            mkdir($dir, 0755, true);
+        }
+
+        file_put_contents($realFile, "# This file is auto-generated during the composer install\n" . Yaml::dump($actualValues, 99));
+    }
+
+    private static function processConfig(array $config)
+    {
+        if (empty($config['file'])) {
+            throw new \InvalidArgumentException('The extra.incenteev-parameters.file setting is required to use this script handler.');
+        }
+
+        if (empty($config['dist-file'])) {
+            $config['dist-file'] = $config['file'].'.dist';
+        }
+
+        if (!is_file($config['dist-file'])) {
+            throw new \InvalidArgumentException(sprintf('The dist file "%s" does not exist. Check your dist-file config or create it.', $config['dist-file']));
+        }
+
+        if (empty($config['parameter-key'])) {
+            $config['parameter-key'] = 'parameters';
+        }
+
+        return $config;
+    }
+
+    private static function processParams(array $config, IOInterface $io, $expectedParams, $actualParams)
+    {
+        // Grab values for parameters that were renamed
+        $renameMap = empty($config['rename-map']) ? array() : (array) $config['rename-map'];
+        $actualParams = array_replace($actualParams, self::processRenamedValues($renameMap, $actualParams));
+
+        $keepOutdatedParams = false;
+        if (isset($config['keep-outdated'])) {
+            $keepOutdatedParams = (boolean) $config['keep-outdated'];
+        }
 
         if (!$keepOutdatedParams) {
             // Remove the outdated params
@@ -75,15 +129,15 @@ class ScriptHandler
             }
         }
 
-        $envMap = empty($extras['incenteev-parameters']['env-map']) ? array() : (array) $extras['incenteev-parameters']['env-map'];
-        $YmlDepth = isset($extras['incenteev-parameters']['yml-depth']) ? $extras['incenteev-parameters']['yml-depth'] : 3;
+        $envMap = empty($config['env-map']) ? array() : (array) $config['env-map'];
+
+        $YmlDepth = isset($extras['yml-depth']) ? $extras['yml-depth'] : 3;
+
 
         // Add the params coming from the environment values
         $actualParams = array_replace($actualParams, self::getEnvValues($envMap));
 
-        $actualParams = self::getParams($io, $expectedParams, $actualParams);
-
-        file_put_contents($realFile, "# This file is auto-generated during the composer install\n" . Yaml::dump(array('parameters' => $actualParams), $YmlDepth));
+        return self::getParams($io, $expectedParams, $actualParams);
     }
 
     private static function getEnvValues(array $envMap)
@@ -97,6 +151,23 @@ class ScriptHandler
         }
 
         return $params;
+    }
+
+    private static function processRenamedValues(array $renameMap, array $actualParams)
+    {
+        foreach ($renameMap as $param => $oldParam) {
+            if (array_key_exists($param, $actualParams)) {
+                continue;
+            }
+
+            if (!array_key_exists($oldParam, $actualParams)) {
+                continue;
+            }
+
+            $actualParams[$param] = $actualParams[$oldParam];
+        }
+
+        return $actualParams;
     }
 
     private static function getParams(IOInterface $io, array $expectedParams, array $actualParams)
