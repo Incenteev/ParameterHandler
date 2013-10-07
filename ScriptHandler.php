@@ -85,7 +85,9 @@ class ScriptHandler
             mkdir($dir, 0755, true);
         }
 
-        file_put_contents($realFile, "# This file is auto-generated during the composer install\n" . Yaml::dump($actualValues, 99));
+        $YmlDepth = isset($extras['yml-depth']) ? $extras['yml-depth'] : 99;
+
+        file_put_contents($realFile, "# This file is auto-generated during the composer install\n" . Yaml::dump($actualValues, $YmlDepth));
     }
 
     private static function processConfig(array $config)
@@ -130,9 +132,6 @@ class ScriptHandler
         }
 
         $envMap = empty($config['env-map']) ? array() : (array) $config['env-map'];
-
-        $YmlDepth = isset($extras['yml-depth']) ? $extras['yml-depth'] : 3;
-
 
         // Add the params coming from the environment values
         $actualParams = array_replace($actualParams, self::getEnvValues($envMap));
