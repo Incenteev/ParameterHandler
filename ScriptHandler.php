@@ -58,7 +58,8 @@ class ScriptHandler
         foreach ($parametersDistFiles as $singleParameterFile) {
             $expectedValues = array_merge($expectedValues, self::loadParameterFile($singleParameterFile));
         }
-        $parametersDistGlobal = $yamlParser->parse(file_get_contents($distFile));
+
+        $parametersDistGlobal = $yamlParser->parse(file_get_contents($config['dist-file']));
         $expectedValues = array($parameterKey=> array_merge($expectedValues[$parameterKey], $parametersDistGlobal[$parameterKey]));
 
         if (!isset($expectedValues[$parameterKey])) {
@@ -85,12 +86,10 @@ class ScriptHandler
             mkdir($dir, 0755, true);
         }
 
-        $YmlDepth = isset($extras['yml-depth']) ? $extras['yml-depth'] : 99;
-
-        file_put_contents($realFile, "# This file is auto-generated during the composer install\n" . Yaml::dump($actualValues, $YmlDepth));
+        file_put_contents($realFile, "# This file is auto-generated during the composer install\n" . Yaml::dump($actualValues, $config['yml-depth']));
     }
 
-    private static function processConfig(array $config)
+    private static function processConfig(array $config) 
     {
         if (empty($config['file'])) {
             throw new \InvalidArgumentException('The extra.incenteev-parameters.file setting is required to use this script handler.');
@@ -107,6 +106,8 @@ class ScriptHandler
         if (empty($config['parameter-key'])) {
             $config['parameter-key'] = 'parameters';
         }
+
+        $config['yml-depth'] = isset($config['yml-depth']) ? $config['yml-depth'] : 99;
 
         return $config;
     }
@@ -132,7 +133,6 @@ class ScriptHandler
         }
 
         $envMap = empty($config['env-map']) ? array() : (array) $config['env-map'];
-
         // Add the params coming from the environment values
         $actualParams = array_replace($actualParams, self::getEnvValues($envMap));
 
