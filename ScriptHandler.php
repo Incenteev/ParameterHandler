@@ -44,7 +44,14 @@ class ScriptHandler
         $io->write(sprintf('<info>%s the "%s" file.</info>', $action, $realFile));
 
         // Find the expected params
-        $expectedValues = $yamlParser->parse(file_get_contents($distFile));
+        $parametersDistFiles = self::getVendorsParametersDistFiles();
+        $expectedValues = array();
+        foreach ($parametersDistFiles as $singleParameterFile) {
+            $expectedValues = array_merge($expectedValues, self::loadParameterFile($singleParameterFile));
+        }
+        $parametersDistGlobal = $yamlParser->parse(file_get_contents($distFile));
+        $expectedValues = array('parameters'=> array_merge($expectedValues['parameters'], $parametersDistGlobal['parameters']));
+
         if (!isset($expectedValues['parameters'])) {
             throw new \InvalidArgumentException('The dist file seems invalid.');
         }
@@ -52,11 +59,9 @@ class ScriptHandler
 
         // find the actual params
         $actualValues = array('parameters' => array());
+
         if ($exists) {
-            $existingValues = $yamlParser->parse(file_get_contents($realFile));
-            if (!is_array($existingValues)) {
-                throw new \InvalidArgumentException(sprintf('The existing "%s" file does not contain an array', $realFile));
-            }
+            $existingValues = self::loadParameterFile($realFile);
             $actualValues = array_merge($actualValues, $existingValues);
         }
         $actualParams = (array) $actualValues['parameters'];
@@ -71,13 +76,14 @@ class ScriptHandler
         }
 
         $envMap = empty($extras['incenteev-parameters']['env-map']) ? array() : (array) $extras['incenteev-parameters']['env-map'];
+        $YmlDepth = isset($extras['incenteev-parameters']['yml-depth']) ? $extras['incenteev-parameters']['yml-depth'] : 3;
 
         // Add the params coming from the environment values
         $actualParams = array_replace($actualParams, self::getEnvValues($envMap));
 
         $actualParams = self::getParams($io, $expectedParams, $actualParams);
 
-        file_put_contents($realFile, "# This file is auto-generated during the composer install\n" . Yaml::dump(array('parameters' => $actualParams)));
+        file_put_contents($realFile, "# This file is auto-generated during the composer install\n" . Yaml::dump(array('parameters' => $actualParams), $YmlDepth));
     }
 
     private static function getEnvValues(array $envMap)
@@ -112,12 +118,79 @@ class ScriptHandler
                 $io->write('<comment>Some parameters are missing. Please provide them.</comment>');
             }
 
-            $default = Inline::dump($message);
-            $value = $io->ask(sprintf('<question>%s</question> (<comment>%s</comment>):', $key, $default), $default);
-
-            $actualParams[$key] = Inline::parse($value);
+            if (is_array($message)) {
+                $actualParams[$key] = self::askForArray($io, $key, $message);
+            } else {
+                $actualParams[$key] = self::askForInline($io, $key, $message);
+            }
         }
 
         return $actualParams;
+    }
+
+    private static function askForArray(IOInterface $io, $key, $message)
+    {
+        $params = array();
+
+        foreach ($message as $simpleMessage) {
+            if (is_string($simpleMessage)) {
+
+                return self::askForInline($io, $key, $message);
+            }
+
+            $default   = current($simpleMessage);
+            $insideKey = key($simpleMessage);
+            if (is_array($default)) {
+                $params[$insideKey] = self::askForArray($io, $key, $default);
+            } else {
+                $value = $io->ask(sprintf('<question>%s</question> (<comment>%s</comment>):', $key, $default), $default);
+                $params[$insideKey] = Inline::parse($value);
+            }
+        }
+
+        return $params;
+    }
+
+    private static function askForInline(IOInterface $io, $key, $message)
+    {
+        $default = Inline::dump($message);
+        $value = $io->ask(sprintf('<question>%s</question> (<comment>%s</comment>):', $key, $default), $default);
+
+        return Inline::parse($value);
+    }
+
+    private static function getVendorsParametersDistFiles()
+    {
+        $configFiles = array();
+
+        foreach (self::getVendorsPaths() as $key => $vendor)
+        {
+            $parametersDistFile = current($vendor) . '/' . str_replace('\\', '/', $key) . '/Resources/config/app/parameters.yml.dist';
+            if (is_file($parametersDistFile)) {
+                $configFiles[] = $parametersDistFile;
+            }
+        }
+
+        return $configFiles;
+    }
+
+    private static function getVendorsPaths()
+    {
+        $vendorDir = dirname(dirname(dirname(dirname(dirname(__FILE__)))));
+
+        return include($vendorDir . '/composer/autoload_namespaces.php');
+    }
+
+    private static function loadParameterFile($realFile)
+    {
+        $yamlParser = new Parser();
+
+        $existingValues = $yamlParser->parse(file_get_contents($realFile));
+        if (!is_array($existingValues)) {
+            throw new \InvalidArgumentException(sprintf('The existing "%s" file does not contain an array', $realFile));
+        }
+
+        return $existingValues;
+
     }
 }

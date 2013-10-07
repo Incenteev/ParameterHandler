@@ -8,6 +8,10 @@
         {
             "name": "Christophe Coevoet",
             "email": "stof@notk.org"
+        },
+        {
+            "name": "Piotr Pasich",
+            "email": "piotr.pasich@xsolve.pl"
         }
     ],
     "minimum-stability": "dev",
