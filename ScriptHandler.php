@@ -54,17 +54,26 @@ class ScriptHandler
         // Find the expected params
 
         $parametersDistFiles = self::getVendorsParametersDistFiles();
-        $expectedValues = array();
+        $expectedValues = array($parameterKey => array());
         foreach ($parametersDistFiles as $singleParameterFile) {
+            $singleFileParameters = self::loadParameterFile($singleParameterFile);
+            if (!isset($singleFileParameters[$parameterKey])) {
+                throw new \InvalidArgumentException('The dist file seems invalid in ' . $singleParameterFile);
+            }
+
             $expectedValues = array_merge($expectedValues, self::loadParameterFile($singleParameterFile));
         }
 
         $parametersDistGlobal = $yamlParser->parse(file_get_contents($config['dist-file']));
-        $expectedValues = array($parameterKey=> array_merge($expectedValues[$parameterKey], $parametersDistGlobal[$parameterKey]));
 
-        if (!isset($expectedValues[$parameterKey])) {
+        if (!isset($parametersDistGlobal[$parameterKey])) {
             throw new \InvalidArgumentException('The dist file seems invalid.');
         }
+
+        $expectedValues = array($parameterKey=> array_merge($expectedValues[$parameterKey], $parametersDistGlobal[$parameterKey]));
+        unset($parametersDistGlobal[$parameterKey]);
+        $expectedValues = array_merge($expectedValues, $parametersDistGlobal);
+
         $expectedParams = (array) $expectedValues[$parameterKey];
 
         $actualValues = array($parameterKey => array());
@@ -74,7 +83,6 @@ class ScriptHandler
         }
 
         $actualValues[$parameterKey] = self::processParams($config, $io, $expectedParams, (array) $actualValues[$parameterKey]);
-
         // Preserve other top-level keys than `$parameterKey` in the file
         foreach ($expectedValues as $key => $setting) {
             if (!array_key_exists($key, $actualValues)) {
@@ -214,8 +222,14 @@ class ScriptHandler
     private static function getVendorsPaths()
     {
         $vendorDir = dirname(dirname(dirname(dirname(dirname(__FILE__)))));
+        $composerAutoloadFile = $vendorDir . '/composer/autoload_namespaces.php';
 
-        return include($vendorDir . '/composer/autoload_namespaces.php');
+        if (file_exists($composerAutoloadFile)) {
+
+            return include($composerAutoloadFile);
+        }
+
+        return array();
     }
 
     private static function loadParameterFile($realFile)
