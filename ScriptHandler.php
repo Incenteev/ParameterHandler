@@ -81,7 +81,7 @@ class ScriptHandler
             mkdir($dir, 0755, true);
         }
 
-        file_put_contents($realFile, "# This file is auto-generated during the composer install\n" . Yaml::dump($actualValues, 99));
+        file_put_contents($realFile, "# This file is auto-generated during the composer install\n" . Yaml::dump($actualValues, $config['yml-depth']));
     }
 
     private static function processConfig(array $config)
