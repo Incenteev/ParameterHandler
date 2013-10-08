@@ -189,6 +189,7 @@ class ScriptHandler
             } else {
                 $actualParams[$key] = self::askForInline($io, $key, $message);
             }
+
         }
 
         return $actualParams;
@@ -209,7 +210,7 @@ class ScriptHandler
             if (is_array($default)) {
                 $params[$insideKey] = self::askForArray($io, "$key [$insideKey]", $default);
             } else {
-                $value = $io->ask(sprintf('<question>%s</question> (<comment>%s</comment>):', "$key [$insideKey]", $default), $default);
+                $value = $io->ask(sprintf('<question>%s</question> (<comment>%s</comment>): ',"$key [$insideKey]", $default), $default);
                 $params[$insideKey] = Inline::parse($value);
             }
         }
@@ -220,8 +221,8 @@ class ScriptHandler
     private static function askForInline(IOInterface $io, $key, $message)
     {
         $default = Inline::dump($message);
-        $value = $io->ask(sprintf('<question>%s</question> (<comment>%s</comment>):', $key, $default), $default);
+        $value = $io->ask(sprintf('<question>%s</question> (<comment>%s</comment>): ', $key, $default), $default);
 
-        return Inline::parse($value);
+        return  Inline::parse($value);
     }
 }
