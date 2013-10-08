@@ -52,19 +52,24 @@ class ScriptHandler
         $io->write(sprintf('<info>%s the "%s" file</info>', $action, $realFile));
 
         // Find the expected params
-        $expectedValues = $yamlParser->parse(file_get_contents($config['dist-file']));
+
+        $parametersDistFiles = self::getVendorsParametersDistFiles();
+        $expectedValues = array();
+        foreach ($parametersDistFiles as $singleParameterFile) {
+            $expectedValues = array_merge($expectedValues, self::loadParameterFile($singleParameterFile));
+        }
+
+        $parametersDistGlobal = $yamlParser->parse(file_get_contents($config['dist-file']));
+        $expectedValues = array($parameterKey=> array_merge($expectedValues[$parameterKey], $parametersDistGlobal[$parameterKey]));
+
         if (!isset($expectedValues[$parameterKey])) {
             throw new \InvalidArgumentException('The dist file seems invalid.');
         }
         $expectedParams = (array) $expectedValues[$parameterKey];
 
-        // find the actual params
         $actualValues = array($parameterKey => array());
         if ($exists) {
-            $existingValues = $yamlParser->parse(file_get_contents($realFile));
-            if (!is_array($existingValues)) {
-                throw new \InvalidArgumentException(sprintf('The existing "%s" file does not contain an array', $realFile));
-            }
+            $existingValues = self::loadParameterFile($realFile);
             $actualValues = array_merge($actualValues, $existingValues);
         }
 
@@ -189,5 +194,40 @@ class ScriptHandler
         }
 
         return $actualParams;
+    }
+
+    private static function getVendorsParametersDistFiles()
+    {
+        $configFiles = array();
+
+        foreach (self::getVendorsPaths() as $key => $vendor)
+        {
+            $parametersDistFile = current($vendor) . '/' . str_replace('\\', '/', $key) . '/Resources/config/app/parameters.yml.dist';
+            if (is_file($parametersDistFile)) {
+                $configFiles[] = $parametersDistFile;
+            }
+        }
+
+        return $configFiles;
+    }
+
+    private static function getVendorsPaths()
+    {
+        $vendorDir = dirname(dirname(dirname(dirname(dirname(__FILE__)))));
+
+        return include($vendorDir . '/composer/autoload_namespaces.php');
+    }
+
+    private static function loadParameterFile($realFile)
+    {
+        $yamlParser = new Parser();
+
+        $existingValues = $yamlParser->parse(file_get_contents($realFile));
+        if (!is_array($existingValues)) {
+            throw new \InvalidArgumentException(sprintf('The existing "%s" file does not contain an array', $realFile));
+        }
+
+        return $existingValues;
+
     }
 }
