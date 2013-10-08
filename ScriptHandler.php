@@ -81,7 +81,7 @@ class ScriptHandler
             mkdir($dir, 0755, true);
         }
 
-        file_put_contents($realFile, "# This file is auto-generated during the composer install\n" . Yaml::dump($actualValues, 99));
+        file_put_contents($realFile, "# This file is auto-generated during the composer install\n" . Yaml::dump($actualValues, $config['yml-depth']));
     }
 
     private static function processConfig(array $config)
@@ -101,6 +101,8 @@ class ScriptHandler
         if (empty($config['parameter-key'])) {
             $config['parameter-key'] = 'parameters';
         }
+
+        $config['yml-depth'] = isset($config['yml-depth']) ? $config['yml-depth'] : 99;
 
         return $config;
     }
@@ -182,12 +184,45 @@ class ScriptHandler
                 $io->write('<comment>Some parameters are missing. Please provide them.</comment>');
             }
 
-            $default = Inline::dump($message);
-            $value = $io->ask(sprintf('<question>%s</question> (<comment>%s</comment>): ', $key, $default), $default);
+            if (is_array($message)) {
+                $actualParams[$key] = self::askForArray($io, $key, $message);
+            } else {
+                $actualParams[$key] = self::askForInline($io, $key, $message);
+            }
 
-            $actualParams[$key] = Inline::parse($value);
         }
 
         return $actualParams;
+    }
+
+    private static function askForArray(IOInterface $io, $key, $message)
+    {
+        $params = array();
+
+        foreach ($message as $simpleMessage) {
+            if (is_string($simpleMessage)) {
+
+                return self::askForInline($io, $key, $message);
+            }
+
+            $default   = current($simpleMessage);
+            $insideKey = key($simpleMessage);
+            if (is_array($default)) {
+                $params[$insideKey] = self::askForArray($io, "$key [$insideKey]", $default);
+            } else {
+                $value = $io->ask(sprintf('<question>%s</question> (<comment>%s</comment>): ',"$key [$insideKey]", $default), $default);
+                $params[$insideKey] = Inline::parse($value);
+            }
+        }
+
+        return $params;
+    }
+
+    private static function askForInline(IOInterface $io, $key, $message)
+    {
+        $default = Inline::dump($message);
+        $value = $io->ask(sprintf('<question>%s</question> (<comment>%s</comment>): ', $key, $default), $default);
+
+        return  Inline::parse($value);
     }
 }
