@@ -52,24 +52,37 @@ class ScriptHandler
         $io->write(sprintf('<info>%s the "%s" file</info>', $action, $realFile));
 
         // Find the expected params
-        $expectedValues = $yamlParser->parse(file_get_contents($config['dist-file']));
-        if (!isset($expectedValues[$parameterKey])) {
+
+        $parametersDistFiles = self::getVendorsParametersDistFiles();
+        $expectedValues = array($parameterKey => array());
+        foreach ($parametersDistFiles as $singleParameterFile) {
+            $singleFileParameters = self::loadParameterFile($singleParameterFile);
+            if (!isset($singleFileParameters[$parameterKey])) {
+                throw new \InvalidArgumentException('The dist file seems invalid in ' . $singleParameterFile);
+            }
+
+            $expectedValues = array_merge($expectedValues, self::loadParameterFile($singleParameterFile));
+        }
+
+        $parametersDistGlobal = $yamlParser->parse(file_get_contents($config['dist-file']));
+
+        if (!isset($parametersDistGlobal[$parameterKey])) {
             throw new \InvalidArgumentException('The dist file seems invalid.');
         }
+
+        $expectedValues = array($parameterKey=> array_merge($expectedValues[$parameterKey], $parametersDistGlobal[$parameterKey]));
+        unset($parametersDistGlobal[$parameterKey]);
+        $expectedValues = array_merge($expectedValues, $parametersDistGlobal);
+
         $expectedParams = (array) $expectedValues[$parameterKey];
 
-        // find the actual params
         $actualValues = array($parameterKey => array());
         if ($exists) {
-            $existingValues = $yamlParser->parse(file_get_contents($realFile));
-            if (!is_array($existingValues)) {
-                throw new \InvalidArgumentException(sprintf('The existing "%s" file does not contain an array', $realFile));
-            }
+            $existingValues = self::loadParameterFile($realFile);
             $actualValues = array_merge($actualValues, $existingValues);
         }
 
         $actualValues[$parameterKey] = self::processParams($config, $io, $expectedParams, (array) $actualValues[$parameterKey]);
-
         // Preserve other top-level keys than `$parameterKey` in the file
         foreach ($expectedValues as $key => $setting) {
             if (!array_key_exists($key, $actualValues)) {
@@ -189,5 +202,46 @@ class ScriptHandler
         }
 
         return $actualParams;
+    }
+
+    private static function getVendorsParametersDistFiles()
+    {
+        $configFiles = array();
+
+        foreach (self::getVendorsPaths() as $key => $vendor)
+        {
+            $parametersDistFile = current($vendor) . '/' . str_replace('\\', '/', $key) . '/Resources/config/app/parameters.yml.dist';
+            if (is_file($parametersDistFile)) {
+                $configFiles[] = $parametersDistFile;
+            }
+        }
+
+        return $configFiles;
+    }
+
+    private static function getVendorsPaths()
+    {
+        $vendorDir = dirname(dirname(dirname(dirname(dirname(__FILE__)))));
+        $composerAutoloadFile = $vendorDir . '/composer/autoload_namespaces.php';
+
+        if (file_exists($composerAutoloadFile)) {
+
+            return include($composerAutoloadFile);
+        }
+
+        return array();
+    }
+
+    private static function loadParameterFile($realFile)
+    {
+        $yamlParser = new Parser();
+
+        $existingValues = $yamlParser->parse(file_get_contents($realFile));
+        if (!is_array($existingValues)) {
+            throw new \InvalidArgumentException(sprintf('The existing "%s" file does not contain an array', $realFile));
+        }
+
+        return $existingValues;
+
     }
 }
