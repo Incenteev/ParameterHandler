@@ -3,7 +3,6 @@
 namespace Incenteev\ParameterHandler\Tests;
 
 use Incenteev\ParameterHandler\ScriptHandler;
-use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTestCase;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Yaml\Yaml;
