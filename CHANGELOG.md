@@ -1,4 +1,4 @@
-## 2.1.0 (2013-XX-XX)
+## 2.1.0 (2013-12-07)
 
 * Move most of the logic to a ``Processor`` class which does not depend on the composer event and package. Ref #30
 * Add the support of existing empty file for Capifony compatibility
