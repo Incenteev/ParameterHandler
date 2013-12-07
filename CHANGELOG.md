@@ -1,5 +1,7 @@
 ## 2.1.0 (2013-XX-XX)
 
+* Move most of the logic to a ``Processor`` class which does not depend on the composer event and package. Ref #30
+* Add the support of existing empty file for Capifony compatibility
 * Add the support of multiple managed files
 * Preserve other top-level keys than the configured one in the file
 * Add a rename map used to rename parameters when updating the parameters file
