@@ -2,5 +2,5 @@
 parameters:
     foo: existing_foo
     boolean: false
-another_key: foo
 extra_key: 'a new extra key'
+another_key: foo

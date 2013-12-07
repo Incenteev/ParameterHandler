@@ -38,7 +38,11 @@ class Processor
         $expectedParams = (array) $expectedValues[$parameterKey];
 
         // find the actual params
-        $actualValues = array($parameterKey => array());
+        $actualValues = array_merge(
+            // Preserve other top-level keys than `$parameterKey` in the file
+            $expectedValues,
+            array($parameterKey => array())
+        );
         if ($exists) {
             $existingValues = $yamlParser->parse(file_get_contents($realFile));
             if ($existingValues === null) {
@@ -51,13 +55,6 @@ class Processor
         }
 
         $actualValues[$parameterKey] = $this->processParams($config, $expectedParams, (array) $actualValues[$parameterKey]);
-
-        // Preserve other top-level keys than `$parameterKey` in the file
-        foreach ($expectedValues as $key => $setting) {
-            if (!array_key_exists($key, $actualValues)) {
-                $actualValues[$key] = $setting;
-            }
-        }
 
         if (!is_dir($dir = dirname($realFile))) {
             mkdir($dir, 0755, true);
@@ -87,7 +84,7 @@ class Processor
         return $config;
     }
 
-    private function processParams(array $config, $expectedParams, $actualParams)
+    private function processParams(array $config, array $expectedParams, array $actualParams)
     {
         // Grab values for parameters that were renamed
         $renameMap = empty($config['rename-map']) ? array() : (array) $config['rename-map'];
@@ -99,12 +96,7 @@ class Processor
         }
 
         if (!$keepOutdatedParams) {
-            // Remove the outdated params
-            foreach ($actualParams as $key => $value) {
-                if (!array_key_exists($key, $expectedParams)) {
-                    unset($actualParams[$key]);
-                }
-            }
+            $actualParams = array_intersect_key($actualParams, $expectedParams);
         }
 
         $envMap = empty($config['env-map']) ? array() : (array) $config['env-map'];
