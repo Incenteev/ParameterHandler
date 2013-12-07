@@ -62,6 +62,9 @@ class ScriptHandler
         $actualValues = array($parameterKey => array());
         if ($exists) {
             $existingValues = $yamlParser->parse(file_get_contents($realFile));
+            if ($existingValues === null) {
+                $existingValues = array();
+            }
             if (!is_array($existingValues)) {
                 throw new \InvalidArgumentException(sprintf('The existing "%s" file does not contain an array', $realFile));
             }
