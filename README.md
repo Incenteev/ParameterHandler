@@ -63,7 +63,7 @@ If composer is run in a non-interactive mode, the values of the dist file
 will be used for missing parameters.
 
 **Warning:** This parameters handler will overwrite any comments or spaces into
-your parameters.yml file so handle with care. So if you want to give format
+your parameters.yml file so handle with care. If you want to give format
 and comments to your parameter's file you should do it on your dist version.
 
 ### Keeping outdated parameters
