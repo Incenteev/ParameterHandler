@@ -22,16 +22,31 @@ class Processor
 
         $realFile = $config['file'];
         $parameterKey = $config['parameter-key'];
+        $fileExtension = $config['file-extension'];
 
         $exists = is_file($realFile);
-
-        $yamlParser = new Parser();
 
         $action = $exists ? 'Updating' : 'Creating';
         $this->io->write(sprintf('<info>%s the "%s" file</info>', $action, $realFile));
 
         // Find the expected params
-        $expectedValues = $yamlParser->parse(file_get_contents($config['dist-file']));
+        $expectedValues = null;
+        $existingValues = null;
+
+        if ('yml' == $fileExtension) {
+            $yamlParser = new Parser();
+            $expectedValues = $yamlParser->parse(file_get_contents($config['dist-file']));
+            if ($exists) {
+                $existingValues = $yamlParser->parse(file_get_contents($realFile));
+            }
+        }
+        if ('php' == $fileExtension) {
+            $expectedValues = include $config['dist-file'];
+            if ($exists) {
+                $existingValues = include $realFile;
+            }
+        }
+
         if (!isset($expectedValues[$parameterKey])) {
             throw new \InvalidArgumentException('The dist file seems invalid.');
         }
@@ -44,7 +59,6 @@ class Processor
             array($parameterKey => array())
         );
         if ($exists) {
-            $existingValues = $yamlParser->parse(file_get_contents($realFile));
             if ($existingValues === null) {
                 $existingValues = array();
             }
@@ -60,7 +74,26 @@ class Processor
             mkdir($dir, 0755, true);
         }
 
-        file_put_contents($realFile, "# This file is auto-generated during the composer install\n" . Yaml::dump($actualValues, 99));
+        if ('yml' == $fileExtension) {
+            $output = <<<EOF
+# This file is auto-generated during the composer install
+%actual.values%
+EOF
+            ;
+            $output = str_replace('%actual.values%', Yaml::dump($actualValues, 99), $output);
+        }
+        if ('php' == $fileExtension) {
+            $output = <<<EOF
+<?php
+
+# This file is auto-generated during the composer install
+return %actual.values%;
+EOF
+            ;
+            $output = str_replace('%actual.values%', var_export($actualValues, true), $output);
+        }
+
+        file_put_contents($realFile, $output);
     }
 
     private function processConfig(array $config)
@@ -79,6 +112,13 @@ class Processor
 
         if (empty($config['parameter-key'])) {
             $config['parameter-key'] = 'parameters';
+        }
+
+        if (empty($config['file-extension'])) {
+            $config['file-extension'] = 'yml';
+        }
+        if (false == in_array($config['file-extension'], array('php', 'yml'))) {
+            throw new \InvalidArgumentException('The extra.incenteev-parameters.file-extension accepts only "php" or "yml" file formats.');
         }
 
         return $config;
