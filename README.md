@@ -3,7 +3,8 @@
 This tool allows you to manage your ignored parameters when running a composer
 install or update. It works when storing the parameters in a Yaml file under
 a single top-level key (named ``parameters`` by default). Other keys are
-copied without change.
+copied without change. It's obviously possible to nest multi-level parameters
+in your Yaml file.
 
 [![Build Status](https://travis-ci.org/Incenteev/ParameterHandler.png)](https://travis-ci.org/Incenteev/ParameterHandler)
 [![Code Coverage](https://scrutinizer-ci.com/g/Incenteev/ParameterHandler/badges/coverage.png?s=ea5de28d9764fdcb6a576a41e244c0ac537b3c81)](https://scrutinizer-ci.com/g/Incenteev/ParameterHandler/)
