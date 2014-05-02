@@ -10,17 +10,19 @@ use Symfony\Component\Yaml\Yaml;
 class Processor
 {
     private $io;
+    private $isStarted;
 
     public function __construct(IOInterface $io)
     {
-        $this->io = $io;
+        $this->io        = $io;
+        $this->isStarted = false;
     }
 
     public function processFile(array $config)
     {
         $config = $this->processConfig($config);
 
-        $realFile = $config['file'];
+        $realFile     = $config['file'];
         $parameterKey = $config['parameter-key'];
 
         $exists = is_file($realFile);
@@ -70,7 +72,7 @@ class Processor
         }
 
         if (empty($config['dist-file'])) {
-            $config['dist-file'] = $config['file'].'.dist';
+            $config['dist-file'] = $config['file'] . '.dist';
         }
 
         if (!is_file($config['dist-file'])) {
@@ -87,7 +89,7 @@ class Processor
     private function processParams(array $config, array $expectedParams, array $actualParams)
     {
         // Grab values for parameters that were renamed
-        $renameMap = empty($config['rename-map']) ? array() : (array) $config['rename-map'];
+        $renameMap    = empty($config['rename-map']) ? array() : (array) $config['rename-map'];
         $actualParams = array_replace($actualParams, $this->processRenamedValues($renameMap, $actualParams));
 
         $keepOutdatedParams = false;
@@ -141,27 +143,62 @@ class Processor
     {
         // Simply use the expectedParams value as default for the missing params.
         if (!$this->io->isInteractive()) {
-            return array_replace($expectedParams, $actualParams);
+            return array_replace_recursive($expectedParams, $actualParams);
         }
 
-        $isStarted = false;
+        $actualParams = $this->provideParams($expectedParams, $actualParams);
 
-        foreach ($expectedParams as $key => $message) {
-            if (array_key_exists($key, $actualParams)) {
+        return $actualParams;
+    }
+
+    /**
+     * @param array  $expectedParams
+     * @param array  $actualParams
+     * @param string $parentKeys
+     *
+     * @return array
+     */
+    private function provideParams(array $expectedParams, array $actualParams, $parentKeys = '')
+    {
+        foreach ($expectedParams as $paramKey => $paramValue) {
+            if (array_key_exists($paramKey, $actualParams) && !is_array($paramValue)) {
                 continue;
             }
 
-            if (!$isStarted) {
-                $isStarted = true;
-                $this->io->write('<comment>Some parameters are missing. Please provide them.</comment>');
+            if (is_array($paramValue)) {
+                if (!array_key_exists($paramKey, $actualParams)) {
+                    $actualParams[$paramKey] = array();
+                }
+
+                $actualParams[$paramKey] = $this->provideParams($paramValue, $actualParams[$paramKey], $this->getParametersPath($parentKeys, $paramKey));
+            } else {
+                if (!$this->isStarted) {
+                    $this->isStarted = true;
+                    $this->io->write('<comment>Some parameters are missing. Please provide them.</comment>');
+                }
+
+                $default                 = Inline::dump($paramValue);
+                $parametersPath          = $this->getParametersPath($parentKeys, $paramKey);
+                $value                   = $this->io->ask(
+                    sprintf('<question>%s</question> (<comment>%s</comment>): ', $parametersPath, $default),
+                    $default
+                );
+                $actualParams[$paramKey] = Inline::parse($value);
             }
 
-            $default = Inline::dump($message);
-            $value = $this->io->ask(sprintf('<question>%s</question> (<comment>%s</comment>): ', $key, $default), $default);
-
-            $actualParams[$key] = Inline::parse($value);
         }
 
         return $actualParams;
+    }
+
+    /**
+     * @param $parentKeys
+     * @param $key
+     *
+     * @return string
+     */
+    private function getParametersPath($parentKeys, $key)
+    {
+        return $parentKeys ? $parentKeys . '.' . $key : $key;
     }
 }
