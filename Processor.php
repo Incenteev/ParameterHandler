@@ -99,7 +99,18 @@ class Processor
             $actualParams = array_intersect_key($actualParams, $expectedParams);
         }
 
-        $envMap = empty($config['env-map']) ? array() : (array) $config['env-map'];
+        $envMap = array();
+        // Add the params coming from the environment values
+        if (!empty($config['env-map'])) {
+            // Hydrate env-map from dist file
+            if ('auto' === $config['env-map']) {
+                array_walk($expectedParams, function($v, $k) use (&$envMap) {
+                    $envMap[$k] = strtoupper($k);
+                });
+            } else {
+                $envMap = (array) $config['env-map'];
+            }
+        }
 
         // Add the params coming from the environment values
         $actualParams = array_replace($actualParams, $this->getEnvValues($envMap));

@@ -2,7 +2,7 @@
 
 This tool allows you to manage your ignored parameters when running a composer
 install or update. It works when storing the parameters in a Yaml file under
-a a single top-level key (named ``parameters`` by default). Other keys are
+a single top-level key (named ``parameters`` by default). Other keys are
 copied without change.
 
 [![Build Status](https://travis-ci.org/Incenteev/ParameterHandler.png)](https://travis-ci.org/Incenteev/ParameterHandler)
@@ -121,6 +121,35 @@ set in the existing parameters file.
 As environment variables can only be strings, they are also parsed as inline
 Yaml values to allows specifying ``null``, ``false``, ``true`` or numbers
 easily.
+
+## Using same names for parameters and environment variables
+
+As an alternative, you can set environment variables with the same uppercased
+name of your dist parameters and use ``"env-map": "auto"`` to get an auto mapping.
+``my_first_param`` parameter will map ``MY_FIRST_PARAM`` environment variable.
+
+Given this ``parameters.yml.dist`` file:
+
+```yaml
+# parameters.yml.dist
+
+parameters:
+    my_first_param: "some value"
+    my_second_param: "another value"
+
+```
+
+Following settings will produce the same result as previous example:
+
+```json
+{
+    "extra": {
+        "incenteev-parameters": {
+            "env-map": "auto"
+        }
+    }
+}
+```
 
 ### Renaming parameters
 

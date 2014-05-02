@@ -1,0 +1,4 @@
+parameters:
+    ic_test_bool: false
+    another: test
+    ic_test_nested: nested
