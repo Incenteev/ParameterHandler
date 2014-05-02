@@ -14,7 +14,7 @@ class Processor
 
     public function __construct(IOInterface $io)
     {
-        $this->io        = $io;
+        $this->io = $io;
         $this->isStarted = false;
     }
 
@@ -22,7 +22,7 @@ class Processor
     {
         $config = $this->processConfig($config);
 
-        $realFile     = $config['file'];
+        $realFile = $config['file'];
         $parameterKey = $config['parameter-key'];
 
         $exists = is_file($realFile);
@@ -89,7 +89,7 @@ class Processor
     private function processParams(array $config, array $expectedParams, array $actualParams)
     {
         // Grab values for parameters that were renamed
-        $renameMap    = empty($config['rename-map']) ? array() : (array) $config['rename-map'];
+        $renameMap = empty($config['rename-map']) ? array() : (array) $config['rename-map'];
         $actualParams = array_replace($actualParams, $this->processRenamedValues($renameMap, $actualParams));
 
         $keepOutdatedParams = false;
@@ -177,9 +177,9 @@ class Processor
                     $this->io->write('<comment>Some parameters are missing. Please provide them.</comment>');
                 }
 
-                $default                 = Inline::dump($paramValue);
-                $parametersPath          = $this->getParametersPath($parentKeys, $paramKey);
-                $value                   = $this->io->ask(
+                $default = Inline::dump($paramValue);
+                $parametersPath = $this->getParametersPath($parentKeys, $paramKey);
+                $value = $this->io->ask(
                     sprintf('<question>%s</question> (<comment>%s</comment>): ', $parametersPath, $default),
                     $default
                 );
