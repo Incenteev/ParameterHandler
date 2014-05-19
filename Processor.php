@@ -22,6 +22,7 @@ class Processor
 
         $realFile = $config['file'];
         $parameterKey = $config['parameter-key'];
+        $noParameterKey = $config['no-parameter-key'];
 
         $exists = is_file($realFile);
 
@@ -32,17 +33,26 @@ class Processor
 
         // Find the expected params
         $expectedValues = $yamlParser->parse(file_get_contents($config['dist-file']));
-        if (!isset($expectedValues[$parameterKey])) {
-            throw new \InvalidArgumentException('The dist file seems invalid.');
+        if ($noParameterKey) {
+            $expectedParams = (array) $expectedValues;
+        } else {
+            if (!isset($expectedValues[$parameterKey])) {
+                throw new \InvalidArgumentException('The dist file seems invalid.');
+            }
+            $expectedParams = (array) $expectedValues[$parameterKey];
         }
-        $expectedParams = (array) $expectedValues[$parameterKey];
 
         // find the actual params
-        $actualValues = array_merge(
-            // Preserve other top-level keys than `$parameterKey` in the file
-            $expectedValues,
-            array($parameterKey => array())
-        );
+        if ($noParameterKey) {
+            $actualValues = array();
+        } else {
+            $actualValues = array_merge(
+                // Preserve other top-level keys than `$parameterKey` in the file
+                $expectedValues,
+                array($parameterKey => array())
+            );
+        }
+
         if ($exists) {
             $existingValues = $yamlParser->parse(file_get_contents($realFile));
             if ($existingValues === null) {
@@ -54,7 +64,11 @@ class Processor
             $actualValues = array_merge($actualValues, $existingValues);
         }
 
-        $actualValues[$parameterKey] = $this->processParams($config, $expectedParams, (array) $actualValues[$parameterKey]);
+        if ($noParameterKey) {
+            $actualValues = $this->processParams($config, $expectedParams, (array) $actualValues);
+        } else {
+            $actualValues[$parameterKey] = $this->processParams($config, $expectedParams, (array) $actualValues[$parameterKey]);
+        }
 
         if (!is_dir($dir = dirname($realFile))) {
             mkdir($dir, 0755, true);
@@ -79,6 +93,10 @@ class Processor
 
         if (empty($config['parameter-key'])) {
             $config['parameter-key'] = 'parameters';
+        }
+
+        if (empty($config['no-parameter-key'])) {
+            $config['no-parameter-key'] = false;
         }
 
         return $config;
