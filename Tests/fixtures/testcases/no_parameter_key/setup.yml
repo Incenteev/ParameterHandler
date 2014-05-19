@@ -1,0 +1,4 @@
+title: "When 'no-parameter-key' config is set to true, top level keys are used as parameters"
+
+config:
+    no-parameter-key: true
