@@ -143,25 +143,24 @@ class Processor
         if (!$this->io->isInteractive()) {
             return array_replace($expectedParams, $actualParams);
         }
-
-        $isStarted = false;
-
-        foreach ($expectedParams as $key => $message) {
-            if (array_key_exists($key, $actualParams)) {
-                continue;
-            }
-
-            if (!$isStarted) {
-                $isStarted = true;
-                $this->io->write('<comment>Some parameters are missing. Please provide them.</comment>');
-            }
-
-            $default = Inline::dump($message);
-            $value = $this->io->ask(sprintf('<question>%s</question> (<comment>%s</comment>): ', $key, $default), $default);
-
-            $actualParams[$key] = Inline::parse($value);
+        $defaults = array_diff_key($expectedParams, $actualParams);
+        if (!empty($defaults)) {
+            $this->io->write('<comment>Some parameters are missing. Please provide them.</comment>');
         }
 
-        return $actualParams;
+        $ask = function($defaults, $params) use (&$ask) {
+            foreach ($defaults as $key => $default) {
+                if (is_array($default)) {
+                    $params[$key] = $ask($default, $params);
+                }
+                else {
+                    $value = $this->io->ask(sprintf('<question>%s</question> (<comment>%s</comment>): ', $key, $default), $default);
+                    $params[$key] = Inline::parse($value);
+                }
+            }
+            return $params;
+        };
+
+        return $ask($defaults, $actualParams);
     }
 }
