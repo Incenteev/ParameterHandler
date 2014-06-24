@@ -151,7 +151,10 @@ class Processor
         $ask = function($defaults, $params) use (&$ask) {
             foreach ($defaults as $key => $default) {
                 if (is_array($default)) {
-                    $params[$key] = $ask($default, $params);
+                    if (!isset ($params[$key])) {
+                        $params[$key] = array();
+                    }
+                    $params[$key] = $ask($default, $params[$key]);
                 }
                 else {
                     $value = $this->io->ask(sprintf('<question>%s</question> (<comment>%s</comment>): ', $key, $default), $default);
