@@ -122,7 +122,7 @@ As environment variables can only be strings, they are also parsed as inline
 Yaml values to allows specifying ``null``, ``false``, ``true`` or numbers
 easily.
 
-## Using same names for parameters and environment variables
+#### Using same names for parameters and environment variables
 
 As an alternative, you can set environment variables with the same uppercased
 name of your dist parameters and use ``"env-map": "auto"`` to get an auto mapping.
