@@ -74,7 +74,7 @@ class ProcessorTest extends ProphecyTestCase
                 array(
                     'file' => 'fixtures/invalid/missing_top_level.yml',
                 ),
-                'The dist file seems invalid.',
+                'The top-level key parameters is missing.',
             ),
             'invalid values in the existing file' => array(
                 array(
