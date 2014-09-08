@@ -1,0 +1,4 @@
+title: No exception is thrown in non-interaction mode if all the required params are provided
+
+config:
+    exception-if-missing: true

@@ -66,6 +66,21 @@ will be used for missing parameters.
 your parameters.yml file so handle with care. If you want to give format
 and comments to your parameter's file you should do it on your dist version.
 
+### Throwing exception if some parameters are missing in non-interactive mode
+
+You can also force the script handler to throw an exception when some parameters
+are missing in non-interactive mode by using `exception-if-missing` param in the configuration:
+
+```json
+{
+    "extra": {
+        "incenteev-parameters": {
+            "exception-if-missing": true
+        }
+    }
+}
+```
+
 ### Keeping outdated parameters
 
 Warning: This script removes outdated params from ``parameters.yml`` which are not in ``parameters.yml.dist``

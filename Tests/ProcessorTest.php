@@ -115,7 +115,9 @@ class ProcessorTest extends ProphecyTestCase
 
         $this->processor->processFile($testCase['config']);
 
-        $this->assertFileEquals($dataDir.'/expected.yml', $workingDir.'/'.$testCase['config']['file'], $testCase['title']);
+        if (file_exists($expected = $dataDir.'/expected.yml')) {
+            $this->assertFileEquals($expected, $workingDir.'/'.$testCase['config']['file'], $testCase['title']);
+        }
     }
 
     private function initializeTestCase(array $testCase, $dataDir, $workingDir)
@@ -147,6 +149,11 @@ class ProcessorTest extends ProphecyTestCase
         $this->io->isInteractive()->willReturn($testCase['interactive']);
 
         if (!$testCase['interactive']) {
+            if (!empty($testCase['config']['exception-if-missing']) && !empty($testCase['missing_params'])) {
+                    $this->setExpectedException(
+                        'RuntimeException',
+                        "Some parameters are missing: ".implode(", ", $testCase['missing_params']).". Please fill them.");
+            }
             return;
         }
 
