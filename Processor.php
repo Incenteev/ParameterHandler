@@ -104,9 +104,9 @@ class Processor
         if (!empty($config['env-map'])) {
             // Hydrate env-map from dist file
             if ('auto' === $config['env-map']) {
-                array_walk($expectedParams, function($v, $k) use (&$envMap) {
-                    $envMap[$k] = strtoupper($k);
-                });
+                foreach ($expectedParams as $key => $value) {
+                    $envMap[$key] = strtoupper($key);
+                }
             } else {
                 $envMap = (array) $config['env-map'];
             }
