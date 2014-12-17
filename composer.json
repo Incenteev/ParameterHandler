@@ -20,9 +20,8 @@
         "symfony/filesystem": "~2.2"
     },
     "autoload": {
-        "psr-0": { "Incenteev\\ParameterHandler": "" }
+        "psr-4": { "Incenteev\\ParameterHandler\\": "" }
     },
-    "target-dir": "Incenteev/ParameterHandler",
     "extra": {
         "branch-alias": {
             "dev-master": "2.1.x-dev"
