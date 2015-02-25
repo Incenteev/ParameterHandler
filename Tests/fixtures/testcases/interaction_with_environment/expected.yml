@@ -7,4 +7,7 @@ parameters:
             - env
             - test
             - null
+    more:
+        nested:
+            param: barfoo
     another: null
