@@ -122,6 +122,32 @@ As environment variables can only be strings, they are also parsed as inline
 Yaml values to allows specifying ``null``, ``false``, ``true`` or numbers
 easily.
 
+### Using .env files as config files
+
+if you want to use `.env` files (e.g. handled by (vlucas/phpdotenv)[https://github.com/vlucas/phpdotenv] you can switch
+the config format easily:
+
+```json
+{
+    "extra": {
+        "incenteev-parameters": {
+            "config-type": "dotenv",
+            "file": ".env",
+            "dist-file" : ".env.dist"
+        }
+    }
+}
+```
+now this ScriptHandler will use these files for syncing config variables.
+
+the `.env` is a bit like `.ini` files, the format is as follows:
+
+```
+MYKEY=foo
+# this is a comment
+ANOTHER_KEY=bar
+```
+
 ### Renaming parameters
 
 If you are renaming a parameter, the new key will be set according to the usual

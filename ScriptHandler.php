@@ -3,6 +3,7 @@
 namespace Incenteev\ParameterHandler;
 
 use Composer\Script\Event;
+use Symfony\Component\Yaml\Parser;
 
 class ScriptHandler
 {
@@ -24,7 +25,7 @@ class ScriptHandler
             $configs = array($configs);
         }
 
-        $processor = new Processor($event->getIO());
+        $processor = new Processor($event->getIO(), new FileHandler(new Parser()));
 
         foreach ($configs as $config) {
             if (!is_array($config)) {

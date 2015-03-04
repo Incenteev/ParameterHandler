@@ -1,0 +1,7 @@
+title: .env config file format
+
+config:
+    file: '.env'
+    config-type: 'dotenv'
+
+dist-file: '.env.dist'

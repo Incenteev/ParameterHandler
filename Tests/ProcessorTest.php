@@ -2,9 +2,11 @@
 
 namespace Incenteev\ParameterHandler\Tests;
 
+use Incenteev\ParameterHandler\FileHandler;
 use Incenteev\ParameterHandler\Processor;
 use Prophecy\PhpUnit\ProphecyTestCase;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Yaml\Parser;
 use Symfony\Component\Yaml\Yaml;
 
 class ProcessorTest extends ProphecyTestCase
@@ -22,7 +24,7 @@ class ProcessorTest extends ProphecyTestCase
         parent::setUp();
 
         $this->io = $this->prophesize('Composer\IO\IOInterface');
-        $this->processor = new Processor($this->io->reveal());
+        $this->processor = new Processor($this->io->reveal(), new FileHandler(new Parser()));
     }
 
     protected function tearDown()
@@ -105,7 +107,7 @@ class ProcessorTest extends ProphecyTestCase
             (array) Yaml::parse(file_get_contents($dataDir.'/setup.yml'))
         );
 
-        $workingDir = sys_get_temp_dir() . '/incenteev_parameter_handler';
+        $workingDir = sys_get_temp_dir().'/incenteev_parameter_handler';
         $exists = $this->initializeTestCase($testCase, $dataDir, $workingDir);
 
         $message = sprintf('<info>%s the "%s" file</info>', $exists ? 'Updating' : 'Creating', $testCase['config']['file']);
@@ -126,7 +128,7 @@ class ProcessorTest extends ProphecyTestCase
             $fs->remove($workingDir);
         }
 
-        $fs->copy($dataDir.'/dist.yml', $workingDir.'/'. $testCase['dist-file']);
+        $fs->copy($dataDir.'/dist.yml', $workingDir.'/'.$testCase['dist-file']);
 
         if ($exists = file_exists($dataDir.'/existing.yml')) {
             $fs->copy($dataDir.'/existing.yml', $workingDir.'/'.$testCase['config']['file']);
