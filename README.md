@@ -122,6 +122,29 @@ As environment variables can only be strings, they are also parsed as inline
 Yaml values to allows specifying ``null``, ``false``, ``true`` or numbers
 easily.
 
+### Using environment variables to replace tags
+
+Environment variables can also be used to replace %tags% in your parameter 
+files. By providing a map between environment variables and the tags, the parameters
+will be searched for occurrences of these tags.
+
+```json
+{
+    "extra": {
+        "incenteev-parameters": {
+            "env-tag-map": {
+                "foo2": "FOO2",
+                "foo3": "FOO3"
+            }
+        }
+    }
+}
+```
+
+If an environment variable is set, its value will always replace any %foo2% and %foo3%
+tags in the parameters file. The parameters are scanned recursively and tags can be
+ part of a string and/or combined with other tags. 
+
 ### Renaming parameters
 
 If you are renaming a parameter, the new key will be set according to the usual

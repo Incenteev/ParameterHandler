@@ -8,3 +8,9 @@ parameters:
             - test
             - null
     another: null
+    tags:
+        foo1: bar1
+        foo2: bar2
+        foo3:
+            foo4: bar2
+            foo5: 'bar2 - bar3'
