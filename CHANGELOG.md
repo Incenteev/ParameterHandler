@@ -1,3 +1,8 @@
+## 2.1.1 (2015-06-03)
+
+* Removed usage of a deprecated way to use the Yaml parser
+* Added a more detailed exception message when the top-level key is missing
+
 ## 2.1.0 (2013-12-07)
 
 * Move most of the logic to a ``Processor`` class which does not depend on the composer event and package. Ref #30

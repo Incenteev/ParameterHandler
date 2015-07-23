@@ -102,7 +102,7 @@ class ProcessorTest extends ProphecyTestCase
                 'environment' => array(),
                 'interactive' => false,
             ),
-            (array) Yaml::parse($dataDir.'/setup.yml')
+            (array) Yaml::parse(file_get_contents($dataDir.'/setup.yml'))
         );
 
         $workingDir = sys_get_temp_dir() . '/incenteev_parameter_handler';
