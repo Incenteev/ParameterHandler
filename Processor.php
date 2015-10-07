@@ -99,7 +99,17 @@ class Processor
             $actualParams = array_intersect_key($actualParams, $expectedParams);
         }
 
-        $envMap = empty($config['env-map']) ? array() : (array) $config['env-map'];
+        $envMap = array();
+        if (!empty($config['env-map'])) {
+            if ('auto' === $config['env-map']) {
+                $envPrefix = !empty($config['env-prefix']) ? $config['env-prefix'] : '';
+                foreach ($expectedParams as $key => $value) {
+                    $envMap[$key] = $envPrefix.strtoupper(str_replace('.', '__', $key));
+                }
+            } else {
+                $envMap = (array)$config['env-map'];
+            }
+        }
 
         // Add the params coming from the environment values
         $actualParams = array_replace($actualParams, $this->getEnvValues($envMap));

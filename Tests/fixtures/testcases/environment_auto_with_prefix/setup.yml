@@ -1,0 +1,11 @@
+title: Automatically mapped values provided by the environment with configured prefix
+
+config:
+    env-map: 'auto'
+    env-prefix: 'SYMFONY__'
+
+environment:
+    SYMFONY__BOOLEAN: 'true'
+    SYMFONY__FOO_BAZ: 'foo_baz'
+    SYMFONY__FOO__BAZ: 'foo.baz'
+    SYMFONY__NESTED: '{foo: env_foo, bar: [env, test, null]}'

@@ -1,0 +1,6 @@
+parameters:
+    boolean: false
+    another: ~
+    nested: nested
+    foo_baz: ''
+    foo.baz: ''

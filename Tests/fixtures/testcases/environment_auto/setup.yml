@@ -1,0 +1,10 @@
+title: Automatically mapped values provided by the environment
+
+config:
+    env-map: 'auto'
+
+environment:
+    BOOLEAN: 'true'
+    FOO_BAZ: 'foo_baz'
+    FOO__BAZ: 'foo.baz'
+    NESTED: '{foo: env_foo, bar: [env, test, null]}'
