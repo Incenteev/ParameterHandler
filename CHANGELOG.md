@@ -1,3 +1,9 @@
+## 2.1.2 (2015-11-10)
+
+* Mark symfony/yaml 3 as supported to be compatible with Symfony 3
+* Dropped support for symfony/yaml 2.2 and older (which are long unmaintained)
+* Added testing on PHP 7
+
 ## 2.1.1 (2015-06-03)
 
 * Removed usage of a deprecated way to use the Yaml parser
