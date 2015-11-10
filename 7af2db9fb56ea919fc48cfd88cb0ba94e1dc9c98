@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by benji07 at 2015-11-06T13:14:48Z
+
+i closed my PR after seeing that one, but It seem this one doesn't work,
+
+https://github.com/Incenteev/ParameterHandler/pull/89/files
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-11-10T14:40:34Z
+
+@stof updated
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-11-10T14:40:57Z
+
+That's the last blocker for Symfony SE 3.0.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-11-10T16:52:43Z
+
+All green
