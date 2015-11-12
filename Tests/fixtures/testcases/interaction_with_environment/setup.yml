@@ -4,10 +4,16 @@ config:
     env-map:
         boolean: IC_TEST_BOOL
         nested: IC_TEST_NESTED
+    env-tag-map:
+        foo2: IC_TEST_FOO2
+        foo3: IC_TEST_FOO3
+        foo4: IC_TEST_FOO4_NOT_SET
 
 environment:
     IC_TEST_BOOL: 'true'
     IC_TEST_NESTED: '{foo: env_foo, bar: [env, test, null]}'
+    IC_TEST_FOO2: bar2
+    IC_TEST_FOO3: bar3
 
 interactive: true
 
@@ -15,3 +21,6 @@ requested_params:
     another:
         default: test
         input: 'null'
+    tags:
+        default: "{ foo1: bar1, foo2: bar2, foo3: { foo4: bar2, foo5: 'bar2 - %foo4%' } }"
+        input: "{ foo1: bar1, foo2: bar2, foo3: { foo4: bar2, foo5: 'bar2 - bar3' } }"

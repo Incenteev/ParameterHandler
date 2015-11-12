@@ -2,3 +2,9 @@ parameters:
     boolean: false
     another: test
     nested: nested
+    tags:
+        foo1: bar1
+        foo2: %foo2%
+        foo3:
+            foo4: %foo2%
+            foo5: '%foo2% - %foo4%'

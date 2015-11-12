@@ -104,16 +104,18 @@ class Processor
         // Add the params coming from the environment values
         $actualParams = array_replace($actualParams, $this->getEnvValues($envMap));
 
-        return $this->getParams($expectedParams, $actualParams);
+        $envValueMap = empty($config['env-tag-map']) ? array() : (array) $config['env-tag-map'];
+
+        return $this->getParams($expectedParams, $actualParams, $this->getEnvValues($envValueMap, '%'));
     }
 
-    private function getEnvValues(array $envMap)
+    private function getEnvValues(array $envMap, $encloseChar = '')
     {
         $params = array();
         foreach ($envMap as $param => $env) {
             $value = getenv($env);
             if ($value) {
-                $params[$param] = Inline::parse($value);
+                $params[$encloseChar . $param . $encloseChar] = Inline::parse($value);
             }
         }
 
@@ -137,8 +139,11 @@ class Processor
         return $actualParams;
     }
 
-    private function getParams(array $expectedParams, array $actualParams)
+    private function getParams(array $expectedParams, array $actualParams, array $envValueMap)
     {
+        // Recursively fill in defaults with values from the environment value map
+        $this->replaceValues($expectedParams, null, $envValueMap);
+
         // Simply use the expectedParams value as default for the missing params.
         if (!$this->io->isInteractive()) {
             return array_replace($expectedParams, $actualParams);
@@ -163,5 +168,29 @@ class Processor
         }
 
         return $actualParams;
+    }
+
+    /**
+     * Translate subject with the string values from the replace values map
+     * Iterates over all values is when subject is an Array
+     *
+     * @param mixed $subject
+     * @param String $key dummy param for array_walk callback compatibility
+     * @param Array $replaceValuesMap
+     * @return mixed $subject
+     */
+    private function replaceValues(&$subject, $key, $replaceValuesMap) {
+        switch (gettype($subject)) {
+            case 'object':
+            case 'array':
+                // Continue recursing through arrays/objects
+                array_walk($subject, array($this, __FUNCTION__), $replaceValuesMap);
+                break;
+
+            case 'string':
+                // Replace values in subject
+                $subject = strtr($subject, $replaceValuesMap);
+                break;
+        }
     }
 }
