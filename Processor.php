@@ -24,7 +24,11 @@ class Processor
         $parameterKey = $config['parameter-key'];
 
         $exists = is_file($realFile);
-
+        if (!$exists && is_link($realFile)) {
+            $realFile = readlink($realFile);
+            $exists = is_file($realFile);
+        }
+        
         $yamlParser = new Parser();
 
         $action = $exists ? 'Updating' : 'Creating';
