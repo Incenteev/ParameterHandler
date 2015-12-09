@@ -100,11 +100,12 @@ class Processor
         }
 
         $envMap = empty($config['env-map']) ? array() : (array) $config['env-map'];
+        $assumeDefaultParams = empty($config['assume-default-for-keys']) ? array() : (array) $config['assume-default-for-keys'];
 
         // Add the params coming from the environment values
         $actualParams = array_replace($actualParams, $this->getEnvValues($envMap));
 
-        return $this->getParams($expectedParams, $actualParams);
+        return $this->getParams($expectedParams, $actualParams, $assumeDefaultParams);
     }
 
     private function getEnvValues(array $envMap)
@@ -137,7 +138,7 @@ class Processor
         return $actualParams;
     }
 
-    private function getParams(array $expectedParams, array $actualParams)
+    private function getParams(array $expectedParams, array $actualParams, array $assumeDefaultParams)
     {
         // Simply use the expectedParams value as default for the missing params.
         if (!$this->io->isInteractive()) {
@@ -156,8 +157,13 @@ class Processor
                 $this->io->write('<comment>Some parameters are missing. Please provide them.</comment>');
             }
 
-            $default = Inline::dump($message);
-            $value = $this->io->ask(sprintf('<question>%s</question> (<comment>%s</comment>): ', $key, $default), $default);
+            if (in_array($key, $assumeDefaultParams)) {
+                $value = Inline::dump($message);
+                $this->io->write(sprintf('<comment>Assumed default value "<info>%s</info>" for parameter <question>%s</question>.</comment>', $value, $key));
+            } else {
+                $default = Inline::dump($message);
+                $value = $this->io->ask(sprintf('<question>%s</question> (<comment>%s</comment>): ', $key, $default), $default);
+            }
 
             $actualParams[$key] = Inline::parse($value);
         }
