@@ -97,6 +97,7 @@ class ProcessorTest extends ProphecyTestCase
                 'title' => 'unknown test',
                 'config' => array(
                     'file' => 'parameters.yml',
+                    'parameter-key' => 'parameters',
                 ),
                 'dist-file' => 'parameters.yml.dist',
                 'environment' => array(),
@@ -111,7 +112,7 @@ class ProcessorTest extends ProphecyTestCase
         $message = sprintf('<info>%s the "%s" file</info>', $exists ? 'Updating' : 'Creating', $testCase['config']['file']);
         $this->io->write($message)->shouldBeCalled();
 
-        $this->setInteractionExpectations($testCase);
+        $this->setInteractionExpectations($testCase, $dataDir);
 
         $this->processor->processFile($testCase['config']);
 
@@ -142,7 +143,7 @@ class ProcessorTest extends ProphecyTestCase
         return $exists;
     }
 
-    private function setInteractionExpectations(array $testCase)
+    private function setInteractionExpectations(array $testCase, $dataDir)
     {
         $this->io->isInteractive()->willReturn($testCase['interactive']);
 
@@ -158,6 +159,16 @@ class ProcessorTest extends ProphecyTestCase
             $this->io->ask(sprintf('<question>%s</question> (<comment>%s</comment>): ', $param, $settings['default']), $settings['default'])
                 ->willReturn($settings['input'])
                 ->shouldBeCalled();
+        }
+
+        if (!empty($testCase['config']['assume-default-for-keys'])) {
+            $distValues = (array) Yaml::parse(file_get_contents($dataDir.'/dist.yml'));
+
+            foreach ($testCase['config']['assume-default-for-keys'] as $param) {
+                $default = $distValues[$testCase['config']['parameter-key']][$param];
+                $this->io->write(sprintf('<comment>Assumed default value "<info>%s</info>" for parameter <question>%s</question>.</comment>', $default, $param))
+                    ->shouldBeCalled();
+            }
         }
     }
 
