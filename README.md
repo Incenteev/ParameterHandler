@@ -149,6 +149,25 @@ If the old parameter is no longer present (maybe because it has been renamed and
 removed already), no parameters are overwritten. You don't need to remove obsolete
 parameters from the rename map once they have been renamed.
 
+### Automatic assumption of parameters default value on interaction mode
+
+If you have several parameters that hardly change their values you can identify them so that
+ the default value is automatically assumed even when using the interactive prompt.
+This is achieved by providing a list (array) of parameters that will assume this behaviour
+ under the `assume-default-for-keys` param in the configuration:
+```json
+{
+    "extra": {
+        "incenteev-parameters": {
+            "assume-default-for-keys": [
+                "my_first_param",
+                "my_second_param"
+            ]
+        }
+    }
+}
+```
+
 ### Managing multiple ignored files
 
 The parameter handler can manage multiple ignored files. To use this feature,
