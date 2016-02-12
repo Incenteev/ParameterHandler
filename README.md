@@ -122,6 +122,27 @@ As environment variables can only be strings, they are also parsed as inline
 Yaml values to allows specifying ``null``, ``false``, ``true`` or numbers
 easily.
 
+### Filtering interactive parameters
+
+By default, the interactive prompt asks for every parameter missing in the
+parameters file. If you want to restrict that behaviour to a particular set
+of parameters, and let the handler use the default values otherwise, you can
+do so by specifying a whitelist in the `interactive-keys` property:
+
+```json
+{
+    "extra": {
+        "incenteev-parameters": {
+            "interactive-keys": [
+                "param_1",
+                "param_3",
+                "param_8"
+            ]
+        }
+    }
+}
+```
+
 ### Renaming parameters
 
 If you are renaming a parameter, the new key will be set according to the usual
