@@ -111,6 +111,11 @@ class ProcessorTest extends ProphecyTestCase
         $message = sprintf('<info>%s the "%s" file</info>', $exists ? 'Updating' : 'Creating', $testCase['config']['file']);
         $this->io->write($message)->shouldBeCalled();
 
+        if (!empty($testCase['config']['env'])) {
+            $message = sprintf('<info>Current environment %s=%s</info>', $testCase['config']['env'], getenv($testCase['config']['env']));
+            $this->io->write($message)->shouldBeCalled();
+        }
+
         $this->setInteractionExpectations($testCase);
 
         $this->processor->processFile($testCase['config']);
@@ -135,7 +140,12 @@ class ProcessorTest extends ProphecyTestCase
         foreach ($testCase['environment'] as $var => $value) {
             $this->environmentBackup[$var] = getenv($var);
             putenv($var.'='.$value);
-        };
+        }
+
+        if (!empty($testCase['config']['env'])) {
+            $env = getenv($testCase['config']['env']);
+            $fs->copy($dataDir.'/'.$env.'.dist.yml', $workingDir.'/'.$env.'.'.$testCase['dist-file']);
+        }
 
         chdir($workingDir);
 

@@ -36,6 +36,13 @@ class Processor
             throw new \InvalidArgumentException(sprintf('The top-level key %s is missing.', $parameterKey));
         }
         $expectedParams = (array) $expectedValues[$parameterKey];
+        if ($config['env-dist-file'] !== null) {
+            $environmentValues = $yamlParser->parse(file_get_contents($config['env-dist-file']));
+            if (!isset($environmentValues[$parameterKey])) {
+                throw new \InvalidArgumentException(sprintf('The top-level key %s is missing.', $parameterKey));
+            }
+            $expectedParams = array_merge($expectedParams, (array)$environmentValues[$parameterKey]);
+        }
 
         // find the actual params
         $actualValues = array_merge(
@@ -75,6 +82,21 @@ class Processor
 
         if (!is_file($config['dist-file'])) {
             throw new \InvalidArgumentException(sprintf('The dist file "%s" does not exist. Check your dist-file config or create it.', $config['dist-file']));
+        }
+
+        $config['env-dist-file'] = null;
+        if (!empty($config['env'])) {
+            $env = getenv($config['env']);
+            if (!empty($env)) {
+                $this->io->write(sprintf('<info>Current environment %s=%s</info>', $config['env'], $env));
+                $distFile = pathinfo($config['dist-file']);
+                $envFile = sprintf('%s/%s.%s', $distFile['dirname'], $env, $distFile['basename']);
+                if (is_file($envFile)) {
+                    $config['env-dist-file'] = $envFile;
+                } else {
+                    $this->io->write(sprintf('<error>File %s not found!</error>', $envFile));
+                }
+            }
         }
 
         if (empty($config['parameter-key'])) {

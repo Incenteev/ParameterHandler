@@ -1,0 +1,3 @@
+parameters:
+    foo: test_foo
+    bar: test_bar
