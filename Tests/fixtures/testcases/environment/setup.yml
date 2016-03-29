@@ -1,0 +1,7 @@
+title: Environment specific file will applied
+
+config:
+  env: APPLICATION_ENV
+
+environment:
+  APPLICATION_ENV: test
