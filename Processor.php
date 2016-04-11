@@ -104,7 +104,7 @@ class Processor
         // Add the params coming from the environment values
         $actualParams = array_replace($actualParams, $this->getEnvValues($envMap));
 
-        return $this->getParams($expectedParams, $actualParams);
+        return $this->getParams($expectedParams, $actualParams, $config);
     }
 
     private function getEnvValues(array $envMap)
@@ -137,7 +137,7 @@ class Processor
         return $actualParams;
     }
 
-    private function getParams(array $expectedParams, array $actualParams)
+    private function getParams(array $expectedParams, array $actualParams, array $config = [])
     {
         // Simply use the expectedParams value as default for the missing params.
         if (!$this->io->isInteractive()) {
@@ -153,7 +153,11 @@ class Processor
 
             if (!$isStarted) {
                 $isStarted = true;
-                $this->io->write('<comment>Some parameters are missing. Please provide them.</comment>');
+                if (empty($config['comment'])) {
+                    $this->io->write('<comment>Some parameters are missing. Please provide them.</comment>');
+                } else {
+                    $this->io->write('<comment>' . $config['comment'] . '</comment>');
+                }
             }
 
             $default = Inline::dump($message);
