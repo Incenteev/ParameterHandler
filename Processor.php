@@ -137,7 +137,7 @@ class Processor
         return $actualParams;
     }
 
-    private function getParams(array $expectedParams, array $actualParams, array $config = [])
+    private function getParams(array $expectedParams, array $actualParams, array $config = array())
     {
         // Simply use the expectedParams value as default for the missing params.
         if (!$this->io->isInteractive()) {
