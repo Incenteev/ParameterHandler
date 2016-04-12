@@ -156,7 +156,7 @@ class Processor
                 if (empty($config['comment'])) {
                     $this->io->write('<comment>Some parameters are missing. Please provide them.</comment>');
                 } else {
-                    $this->io->write('<comment>' . $config['comment'] . '</comment>');
+                    $this->io->write(sprintf('<comment>%s</comment>', $config['comment']));
                 }
             }
 
