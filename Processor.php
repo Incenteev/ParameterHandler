@@ -4,16 +4,36 @@ namespace Incenteev\ParameterHandler;
 
 use Composer\IO\IOInterface;
 use Symfony\Component\Yaml\Inline;
-use Symfony\Component\Yaml\Parser;
-use Symfony\Component\Yaml\Yaml;
 
 class Processor
 {
     private $io;
 
+    /**
+     * @var <FileProcessorInterface> 
+     */
+    private $processors = array();
+
     public function __construct(IOInterface $io)
     {
         $this->io = $io;
+    }
+
+    public function addProcessor(FileProcessorInterface $processor)
+    {
+        $this->processors[] = $processor;
+    }
+
+    private function getProcessorForFile($file)
+    {
+        $extension = substr($file, strpos($file, '.') + 1);
+
+        foreach ($this->processors as $processor) {
+            if ($processor->supports($extension)) {
+                return $processor;
+            }
+        }
+        throw new \InvalidArgumentException(sprintf('No file processor found for file %s.', $file));
     }
 
     public function processFile(array $config)
@@ -25,13 +45,12 @@ class Processor
 
         $exists = is_file($realFile);
 
-        $yamlParser = new Parser();
-
+        $processor = $this->getProcessorForFile($realFile);
         $action = $exists ? 'Updating' : 'Creating';
         $this->io->write(sprintf('<info>%s the "%s" file</info>', $action, $realFile));
 
         // Find the expected params
-        $expectedValues = $yamlParser->parse(file_get_contents($config['dist-file']));
+        $expectedValues = $processor->parse($config['dist-file']);
         if (!isset($expectedValues[$parameterKey])) {
             throw new \InvalidArgumentException(sprintf('The top-level key %s is missing.', $parameterKey));
         }
@@ -39,12 +58,11 @@ class Processor
 
         // find the actual params
         $actualValues = array_merge(
-            // Preserve other top-level keys than `$parameterKey` in the file
-            $expectedValues,
-            array($parameterKey => array())
+                // Preserve other top-level keys than `$parameterKey` in the file
+                $expectedValues, array($parameterKey => array())
         );
         if ($exists) {
-            $existingValues = $yamlParser->parse(file_get_contents($realFile));
+            $existingValues = $processor->parse($realFile);
             if ($existingValues === null) {
                 $existingValues = array();
             }
@@ -60,7 +78,7 @@ class Processor
             mkdir($dir, 0755, true);
         }
 
-        file_put_contents($realFile, "# This file is auto-generated during the composer install\n" . Yaml::dump($actualValues, 99));
+        $processor->dump($realFile, $actualValues);
     }
 
     private function processConfig(array $config)
@@ -70,7 +88,7 @@ class Processor
         }
 
         if (empty($config['dist-file'])) {
-            $config['dist-file'] = $config['file'].'.dist';
+            $config['dist-file'] = $config['file'] . '.dist';
         }
 
         if (!is_file($config['dist-file'])) {
