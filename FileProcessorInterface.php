@@ -8,5 +8,5 @@ interface FileProcessorInterface
 
     public function dump($file, $values);
 
-    public function supports($file);
+    public function supports($extension);
 }

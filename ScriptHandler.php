@@ -25,7 +25,6 @@ class ScriptHandler
         }
 
         $processor = new Processor($event->getIO());
-        $processor->addProcessor(new YamlProcessor());
 
         foreach ($configs as $config) {
             if (!is_array($config)) {

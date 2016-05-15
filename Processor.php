@@ -17,6 +17,8 @@ class Processor
     public function __construct(IOInterface $io)
     {
         $this->io = $io;
+
+        $this->addProcessor(new YamlProcessor());
     }
 
     public function addProcessor(FileProcessorInterface $processor)
