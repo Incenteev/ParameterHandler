@@ -111,9 +111,13 @@ class Processor
     {
         $params = array();
         foreach ($envMap as $param => $env) {
-            $value = getenv($env);
-            if ($value) {
-                $params[$param] = Inline::parse($value);
+            if (is_array($env)) {
+                $params[$param] = $this->getEnvValues($env);
+            } else {
+                $value = getenv($env);
+                if ($value) {
+                    $params[$param] = Inline::parse($value);
+                }
             }
         }
 
