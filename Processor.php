@@ -145,7 +145,7 @@ class Processor
     {
         // Simply use the expectedParams value as default for the missing params.
         if (!$this->io->isInteractive()) {
-            return array_replace($expectedParams, $actualParams);
+            return array_replace_recursive($expectedParams, $actualParams);
         }
 
         $isStarted = false;
