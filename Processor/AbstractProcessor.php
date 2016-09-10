@@ -96,10 +96,6 @@ abstract class AbstractProcessor
      */
     protected function processConfig(array $config)
     {
-        if (empty($config['file'])) {
-            throw new \InvalidArgumentException('The extra.incenteev-parameters.file setting is required to use this script handler.');
-        }
-
         if (empty($config['dist-file'])) {
             $config['dist-file'] = $config['file'].'.dist';
         }

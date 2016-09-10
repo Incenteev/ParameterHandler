@@ -54,10 +54,6 @@ class ProcessorTest extends ProphecyTestCase
     public function provideInvalidConfiguration()
     {
         return array(
-            'no file' => array(
-                array(),
-                'The extra.incenteev-parameters.file setting is required to use this script handler.',
-            ),
             'missing default dist file' => array(
                 array(
                     'file' => 'fixtures/invalid/missing.yml',

@@ -71,6 +71,10 @@ class ScriptHandler
                 throw new \InvalidArgumentException('The extra.incenteev-parameters setting must be an array of configuration objects.');
             }
 
+            if (!array_key_exists('file', $config)) {
+                throw new \InvalidArgumentException('The extra.incenteev-parameters.file setting is required to use this script handler.');
+            }
+
             $type = self::retrieveConfigurationTypeByFile($config['file']);
 
             if (self::CONFIGURATION_FORMAT_YAML === $type) {
@@ -89,9 +93,6 @@ class ScriptHandler
 
             $processor->processFile($config);
         }
-
-        echo 'ALALALALA';
-        die;
     }
 
     /**
