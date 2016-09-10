@@ -1,37 +1,60 @@
 <?php
 
-namespace Incenteev\ParameterHandler;
+namespace Incenteev\ParameterHandler\Processor;
 
 use Composer\IO\IOInterface;
+use Incenteev\ParameterHandler\Parser\JsonParser;
+use Symfony\Component\Yaml\Parser as YamlParser;
 use Symfony\Component\Yaml\Inline;
-use Symfony\Component\Yaml\Parser;
-use Symfony\Component\Yaml\Yaml;
 
-class Processor
+abstract class AbstractProcessor
 {
-    private $io;
+    /**
+     * IO Interface of composer used for displaying messages.
+     *
+     * @var IOInterface
+     */
+    protected $io;
 
-    public function __construct(IOInterface $io)
+    /**
+     * Parser.
+     *
+     * @var IOInterface
+     */
+    protected $parser;
+
+    /**
+     * Constructor.
+     *
+     * @param IOInterface           $io     Composer IO Interface
+     * @param YamlParser|JsonParser $parser Instance of parser to parse configuration
+     */
+    public function __construct(IOInterface $io, $parser)
     {
-        $this->io = $io;
+        $this->parser = $parser;
+        $this->io     = $io;
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @throws \InvalidArgumentException|\RuntimeException
+     */
     public function processFile(array $config)
     {
         $config = $this->processConfig($config);
 
-        $realFile = $config['file'];
+        $realFile     = $config['file'];
         $parameterKey = $config['parameter-key'];
 
         $exists = is_file($realFile);
-
-        $yamlParser = new Parser();
 
         $action = $exists ? 'Updating' : 'Creating';
         $this->io->write(sprintf('<info>%s the "%s" file</info>', $action, $realFile));
 
         // Find the expected params
-        $expectedValues = $yamlParser->parse(file_get_contents($config['dist-file']));
+        $expectedValues = $this->parser->parse(file_get_contents($config['dist-file']));
+
         if (!isset($expectedValues[$parameterKey])) {
             throw new \InvalidArgumentException(sprintf('The top-level key %s is missing.', $parameterKey));
         }
@@ -39,14 +62,14 @@ class Processor
 
         // find the actual params
         $actualValues = array_merge(
-            // Preserve other top-level keys than `$parameterKey` in the file
+        // Preserve other top-level keys than `$parameterKey` in the file
             $expectedValues,
-            array($parameterKey => array())
+            [$parameterKey => []]
         );
         if ($exists) {
-            $existingValues = $yamlParser->parse(file_get_contents($realFile));
+            $existingValues = $this->parser->parse(file_get_contents($realFile));
             if ($existingValues === null) {
-                $existingValues = array();
+                $existingValues = [];
             }
             if (!is_array($existingValues)) {
                 throw new \InvalidArgumentException(sprintf('The existing "%s" file does not contain an array', $realFile));
@@ -56,14 +79,22 @@ class Processor
 
         $actualValues[$parameterKey] = $this->processParams($config, $expectedParams, (array) $actualValues[$parameterKey]);
 
-        if (!is_dir($dir = dirname($realFile))) {
-            mkdir($dir, 0755, true);
+        if (!is_dir($dir = dirname($realFile)) && (!@mkdir($dir, 0755, true) && !is_dir($dir))) {
+            throw new \RuntimeException(
+                sprintf('Error while creating directory "%s". Check path and permissions.', $dir)
+            );
         }
 
-        file_put_contents($realFile, "# This file is auto-generated during the composer install\n" . Yaml::dump($actualValues, 99));
+        $this->writeFile($realFile, $actualValues);
     }
 
-    private function processConfig(array $config)
+    /**
+     * @param array $config
+     * @return array
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function processConfig(array $config)
     {
         if (empty($config['file'])) {
             throw new \InvalidArgumentException('The extra.incenteev-parameters.file setting is required to use this script handler.');
@@ -84,10 +115,10 @@ class Processor
         return $config;
     }
 
-    private function processParams(array $config, array $expectedParams, array $actualParams)
+    protected function processParams(array $config, array $expectedParams, array $actualParams)
     {
         // Grab values for parameters that were renamed
-        $renameMap = empty($config['rename-map']) ? array() : (array) $config['rename-map'];
+        $renameMap    = empty($config['rename-map']) ? [] : (array) $config['rename-map'];
         $actualParams = array_replace($actualParams, $this->processRenamedValues($renameMap, $actualParams));
 
         $keepOutdatedParams = false;
@@ -99,7 +130,7 @@ class Processor
             $actualParams = array_intersect_key($actualParams, $expectedParams);
         }
 
-        $envMap = empty($config['env-map']) ? array() : (array) $config['env-map'];
+        $envMap = empty($config['env-map']) ? [] : (array) $config['env-map'];
 
         // Add the params coming from the environment values
         $actualParams = array_replace($actualParams, $this->getEnvValues($envMap));
@@ -107,9 +138,18 @@ class Processor
         return $this->getParams($expectedParams, $actualParams);
     }
 
-    private function getEnvValues(array $envMap)
+    /**
+     * Parses environments variables by map and resolves correct types.
+     * As environment variables can only be strings, they are also parsed to allow specifying null, false,
+     * true or numbers easily.
+     *
+     * @param array $envMap Map used to map data from environment variable name to parameter name.
+     *
+     * @return array
+     */
+    protected function getEnvValues(array $envMap)
     {
-        $params = array();
+        $params = [];
         foreach ($envMap as $param => $env) {
             $value = getenv($env);
             if ($value) {
@@ -146,7 +186,7 @@ class Processor
 
         $isStarted = false;
 
-        foreach ($expectedParams as $key => $message) {
+        foreach ($expectedParams as $key => $value) {
             if (array_key_exists($key, $actualParams)) {
                 continue;
             }
@@ -156,12 +196,23 @@ class Processor
                 $this->io->write('<comment>Some parameters are missing. Please provide them.</comment>');
             }
 
-            $default = Inline::dump($message);
-            $value = $this->io->ask(sprintf('<question>%s</question> (<comment>%s</comment>): ', $key, $default), $default);
+            $default = Inline::dump($value);
+
+            $value   = $this->io->ask(sprintf('<question>%s</question> (<comment>%s</comment>): ', $key, $default), $default);
 
             $actualParams[$key] = Inline::parse($value);
         }
 
         return $actualParams;
     }
+
+    /**
+     * Persists configuration.
+     *
+     * @param string $file          Filename to persist configuration to.
+     * @param array  $configuration Configuration to persist as an array.
+     *
+     * @return bool TRUE after successful persisting the file, otherwise FALSE
+     */
+    abstract protected function writeFile($file, array $configuration);
 }

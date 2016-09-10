@@ -2,7 +2,8 @@
 
 namespace Incenteev\ParameterHandler\Tests;
 
-use Incenteev\ParameterHandler\Processor;
+use Incenteev\ParameterHandler\Parser\YamlParser;
+use Incenteev\ParameterHandler\Processor\YamlProcessor;
 use Prophecy\PhpUnit\ProphecyTestCase;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Yaml\Yaml;
@@ -22,7 +23,7 @@ class ProcessorTest extends ProphecyTestCase
         parent::setUp();
 
         $this->io = $this->prophesize('Composer\IO\IOInterface');
-        $this->processor = new Processor($this->io->reveal());
+        $this->processor = new YamlProcessor($this->io->reveal(), new YamlParser());
     }
 
     protected function tearDown()
