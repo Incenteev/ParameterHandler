@@ -20,14 +20,91 @@ class JsonParser implements ParserInterface
     {
         $result = json_decode($value, $assoc, $depth, $flags);
 
-        if (null === $result) {
-            $errorCode    = json_last_error();
-            $errorMessage = json_last_error_msg();
+        return (null === $result) ? false : $result;
+    }
 
-            //  public function __construct($message, $parsedLine = -1, $snippet = null, $parsedFile = null, \Exception $previous = null)
-            throw new ParseException(
-                sprintf('Error "%s: %s" while parsing JSON string.', $errorCode, $errorMessage)
-            );
+    /**
+     * Dumps a given array of data to JSON format.
+     *
+     * @param array $data Data to dump.
+     *
+     * @author Benjamin Carl <opensource@clickalicious.de>
+     *
+     * @return string Dumped JSON data
+     */
+    public function dump(array $data)
+    {
+        return $this->prettyPrint(json_encode($data));
+    }
+
+    /**
+     * Pretty print JSON custom implementation for compatibility with PHP < 5.4 and custom spacing.
+     *
+     * @param string $json    JSON data to be pretty printed
+     * @param string $spacer  Spacer used e.g. ' ' or "\t"
+     * @param int    $spacing Multiplicator for spacer (count)
+     *
+     * @author Benjamin Carl <opensource@clickalicious.de>
+     *
+     * @return string Pretty printed JSON data
+     */
+    protected function prettyPrint($json, $spacer = ' ', $spacing = 2)
+    {
+        $result          = '';
+        $level           = 0;
+        $in_quotes       = false;
+        $in_escape       = false;
+        $ends_line_level = null;
+        $json_length     = strlen($json);
+
+        for ($i = 0; $i < $json_length; ++$i) {
+            $char           = $json[$i];
+            $new_line_level = null;
+            $post           = '';
+            if ($ends_line_level !== null) {
+                $new_line_level  = $ends_line_level;
+                $ends_line_level = null;
+            }
+            if ($in_escape) {
+                $in_escape = false;
+            } elseif ($char === '"') {
+                $in_quotes = !$in_quotes;
+            } elseif (!$in_quotes) {
+                switch ($char) {
+                    case '}':
+                    case ']':
+                        $level--;
+                        $ends_line_level = null;
+                        $new_line_level  = $level;
+                        break;
+
+                    case '{':
+                    case '[':
+                        $level++;
+                    case ',':
+                        $ends_line_level = $level;
+                        break;
+
+                    case ':':
+                        $post = ' ';
+                        break;
+
+                    case ' ':
+                    case "\t":
+                    case "\n":
+                    case "\r":
+                        $char            = '';
+                        $ends_line_level = $new_line_level;
+                        $new_line_level  = null;
+                        break;
+                }
+            } elseif ($char === '\\') {
+                $in_escape = true;
+            }
+            if ($new_line_level !== null) {
+                $result .= "\n".str_repeat(str_repeat($spacer, $spacing), $new_line_level);
+            }
+            $result .= $char.$post;
         }
 
         return $result;

@@ -90,6 +90,7 @@ abstract class AbstractProcessor
 
     /**
      * @param array $config
+     *
      * @return array
      *
      * @throws \InvalidArgumentException
@@ -194,7 +195,7 @@ abstract class AbstractProcessor
 
             $default = Inline::dump($value);
 
-            $value   = $this->io->ask(sprintf('<question>%s</question> (<comment>%s</comment>): ', $key, $default), $default);
+            $value = $this->io->ask(sprintf('<question>%s</question> (<comment>%s</comment>): ', $key, $default), $default);
 
             $actualParams[$key] = Inline::parse($value);
         }

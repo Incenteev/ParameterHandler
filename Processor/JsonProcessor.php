@@ -13,7 +13,7 @@ class JsonProcessor extends AbstractProcessor implements ProcessorInterface
     {
         return
             false !== file_put_contents(
-                $filename, json_encode($configuration, JSON_PRETTY_PRINT)
+                $filename, $this->parser->dump($configuration)
             );
     }
 }

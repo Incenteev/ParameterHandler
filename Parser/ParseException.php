@@ -2,7 +2,7 @@
 
 namespace Incenteev\ParameterHandler\Parser;
 
-class ParseException extends \Symfony\Component\Yaml\Exception\ParseException
+class ParseException extends \InvalidArgumentException
 {
     // Intentionally left empty.
 }

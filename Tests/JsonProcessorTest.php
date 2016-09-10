@@ -2,16 +2,16 @@
 
 namespace Incenteev\ParameterHandler\Tests;
 
-use Incenteev\ParameterHandler\Parser\YamlParser;
-use Incenteev\ParameterHandler\Processor\YamlProcessor;
+use Incenteev\ParameterHandler\Parser\JsonParser;
+use Incenteev\ParameterHandler\Processor\JsonProcessor;
 use Prophecy\PhpUnit\ProphecyTestCase;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Yaml\Yaml;
 
-class YamlProcessorTest extends ProphecyTestCase
+class JsonProcessorTest extends ProphecyTestCase
 {
     private $io;
-    private $environmentBackup = array();
+    private $environmentBackup = [];
 
     /**
      * @var Processor
@@ -22,8 +22,8 @@ class YamlProcessorTest extends ProphecyTestCase
     {
         parent::setUp();
 
-        $this->io = $this->prophesize('Composer\IO\IOInterface');
-        $this->processor = new YamlProcessor($this->io->reveal(), new YamlParser());
+        $this->io        = $this->prophesize('Composer\IO\IOInterface');
+        $this->processor = new JsonProcessor($this->io->reveal(), new JsonParser());
     }
 
     protected function tearDown()
@@ -53,33 +53,33 @@ class YamlProcessorTest extends ProphecyTestCase
 
     public function provideInvalidConfiguration()
     {
-        return array(
-            'missing default dist file' => array(
-                array(
-                    'file' => 'fixtures/yaml/invalid/missing.yml',
-                ),
-                'The dist file "fixtures/yaml/invalid/missing.yml.dist" does not exist. Check your dist-file config or create it.',
-            ),
-            'missing custom dist file' => array(
-                array(
-                    'file' => 'fixtures/yaml/invalid/missing.yml',
-                    'dist-file' => 'fixtures/yaml/invalid/non-existent.dist.yml',
-                ),
-                'The dist file "fixtures/yaml/invalid/non-existent.dist.yml" does not exist. Check your dist-file config or create it.',
-            ),
-            'missing top level key in dist file' => array(
-                array(
-                    'file' => 'fixtures/yaml/invalid/missing_top_level.yml',
-                ),
+        return [
+            'missing default dist file' => [
+                [
+                    'file' => 'fixtures/json/invalid/missing.json',
+                ],
+                'The dist file "fixtures/json/invalid/missing.json.dist" does not exist. Check your dist-file config or create it.',
+            ],
+            'missing custom dist file' => [
+                [
+                    'file'      => 'fixtures/json/invalid/missing.json',
+                    'dist-file' => 'fixtures/json/invalid/non-existent.dist.json',
+                ],
+                'The dist file "fixtures/json/invalid/non-existent.dist.json" does not exist. Check your dist-file config or create it.',
+            ],
+            'missing top level key in dist file' => [
+                [
+                    'file' => 'fixtures/json/invalid/missing_top_level.json',
+                ],
                 'The top-level key parameters is missing.',
-            ),
-            'invalid values in the existing file' => array(
-                array(
-                    'file' => 'fixtures/yaml/invalid/invalid_existing_values.yml',
-                ),
-                'The existing "fixtures/yaml/invalid/invalid_existing_values.yml" file does not contain an array',
-            ),
-        );
+            ],
+            'invalid values in the existing file' => [
+                [
+                    'file' => 'fixtures/json/invalid/invalid_existing_values.json',
+                ],
+                'The existing "fixtures/json/invalid/invalid_existing_values.json" file does not contain an array',
+            ],
+        ];
     }
 
     /**
@@ -87,23 +87,23 @@ class YamlProcessorTest extends ProphecyTestCase
      */
     public function testParameterHandling($testCaseName)
     {
-        $dataDir = __DIR__.'/fixtures/yaml/testcases/'.$testCaseName;
+        $dataDir = __DIR__.'/fixtures/json/testcases/'.$testCaseName;
 
         $testCase = array_replace_recursive(
-            array(
-                'title' => 'unknown test',
-                'config' => array(
-                    'file' => 'parameters.yml',
-                ),
-                'dist-file' => 'parameters.yml.dist',
-                'environment' => array(),
+            [
+                'title'  => 'unknown test',
+                'config' => [
+                    'file' => 'parameters.json',
+                ],
+                'dist-file'   => 'parameters.json.dist',
+                'environment' => [],
                 'interactive' => false,
-            ),
+            ],
             (array) Yaml::parse(file_get_contents($dataDir.'/setup.yml'))
         );
 
-        $workingDir = sys_get_temp_dir() . '/incenteev_parameter_handler';
-        $exists = $this->initializeTestCase($testCase, $dataDir, $workingDir);
+        $workingDir = sys_get_temp_dir().'/incenteev_parameter_handler';
+        $exists     = $this->initializeTestCase($testCase, $dataDir, $workingDir);
 
         $message = sprintf('<info>%s the "%s" file</info>', $exists ? 'Updating' : 'Creating', $testCase['config']['file']);
         $this->io->write($message)->shouldBeCalled();
@@ -112,7 +112,7 @@ class YamlProcessorTest extends ProphecyTestCase
 
         $this->processor->processFile($testCase['config']);
 
-        $this->assertFileEquals($dataDir.'/expected.yml', $workingDir.'/'.$testCase['config']['file'], $testCase['title']);
+        $this->assertFileEquals($dataDir.'/expected.json', $workingDir.'/'.$testCase['config']['file'], $testCase['title']);
     }
 
     private function initializeTestCase(array $testCase, $dataDir, $workingDir)
@@ -123,10 +123,10 @@ class YamlProcessorTest extends ProphecyTestCase
             $fs->remove($workingDir);
         }
 
-        $fs->copy($dataDir.'/dist.yml', $workingDir.'/'. $testCase['dist-file']);
+        $fs->copy($dataDir.'/dist.json', $workingDir.'/'.$testCase['dist-file']);
 
-        if ($exists = file_exists($dataDir.'/existing.yml')) {
-            $fs->copy($dataDir.'/existing.yml', $workingDir.'/'.$testCase['config']['file']);
+        if ($exists = file_exists($dataDir.'/existing.json')) {
+            $fs->copy($dataDir.'/existing.json', $workingDir.'/'.$testCase['config']['file']);
         }
 
         foreach ($testCase['environment'] as $var => $value) {
@@ -160,10 +160,10 @@ class YamlProcessorTest extends ProphecyTestCase
 
     public function provideParameterHandlingTestCases()
     {
-        $tests = array();
+        $tests = [];
 
-        foreach (glob(__DIR__.'/fixtures/yaml/testcases/*/') as $folder) {
-            $tests[] = array(basename($folder));
+        foreach (glob(__DIR__.'/fixtures/json/testcases/*/') as $folder) {
+            $tests[] = [basename($folder)];
         }
 
         return $tests;
