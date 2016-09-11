@@ -1,6 +1,6 @@
 {
   "parameters": {
-    "foo": "bar",
+    "foo": "existing_foo",
     "boolean": false,
     "another": "null"
   }
