@@ -1,0 +1,7 @@
+{
+  "parameters": {
+    "boolean": false,
+    "another": "test",
+    "nested": "nested"
+  }
+}

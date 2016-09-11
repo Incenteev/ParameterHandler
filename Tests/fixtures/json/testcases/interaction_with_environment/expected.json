@@ -1,0 +1,14 @@
+{
+  "parameters": {
+    "boolean": true,
+    "nested": {
+      "foo": "env_foo",
+      "bar": [
+        "env",
+        "test",
+        null
+      ]
+    },
+    "another": null
+  }
+}
