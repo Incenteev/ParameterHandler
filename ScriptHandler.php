@@ -101,7 +101,7 @@ class ScriptHandler
      *
      * @param string $file File to parse extension from
      *
-     * @return string Type of configuration, either self::FILE_TYPE_YAML or self::FILE_TYPE_JSON
+     * @return string Type of configuration, either self::CONFIGURATION_FORMAT_YAML or self::CONFIGURATION_FORMAT_JSON
      */
     private static function retrieveConfigurationTypeByFile($file)
     {

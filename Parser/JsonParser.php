@@ -35,8 +35,6 @@ class JsonParser implements ParserInterface
      *
      * @param array $data Data to dump.
      *
-     * @author Benjamin Carl <opensource@clickalicious.de>
-     *
      * @return string Dumped JSON data
      */
     public function dump(array $data)
@@ -45,17 +43,17 @@ class JsonParser implements ParserInterface
     }
 
     /**
-     * Pretty print JSON custom implementation for compatibility with PHP < 5.4 and custom spacing.
+     * Returns pretty printed JSON string.
+     * Custom implementation for compatibility with PHP < 5.4 and custom spacing.
      *
-     * @param string $json    JSON data to be pretty printed
-     * @param string $spacer  Spacer used e.g. ' ' or "\t"
-     * @param int    $spacing Multiplicator for spacer (count)
-     *
-     * @author Benjamin Carl <opensource@clickalicious.de>
+     * @param string $json         JSON data to be pretty printed
+     * @param string $spacer       Spacer used e.g. ' ' or "\t"
+     * @param int    $spacing      Multiplicand for spacer (count)
+     * @param bool   $newLineAtEof Whether to write a nl at end of file or not
      *
      * @return string Pretty printed JSON data
      */
-    protected function prettyPrint($json, $spacer = ' ', $spacing = 2)
+    protected function prettyPrint($json, $spacer = ' ', $spacing = 2, $newLineAtEof = true)
     {
         $result          = '';
         $level           = 0;
@@ -112,6 +110,12 @@ class JsonParser implements ParserInterface
                 $result .= "\n".str_repeat(str_repeat($spacer, $spacing), $new_line_level);
             }
             $result .= $char.$post;
+        }
+
+        $result = trim($result);
+
+        if (true === $newLineAtEof) {
+            $result .= PHP_EOL;
         }
 
         return $result;
