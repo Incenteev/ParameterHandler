@@ -53,33 +53,33 @@ class JsonProcessorTest extends ProphecyTestCase
 
     public function provideInvalidConfiguration()
     {
-        return [
-            'missing default dist file' => [
-                [
+        return array(
+            'missing default dist file' => array(
+                array(
                     'file' => 'fixtures/json/invalid/missing.json',
-                ],
+                ),
                 'The dist file "fixtures/json/invalid/missing.json.dist" does not exist. Check your dist-file config or create it.',
-            ],
-            'missing custom dist file' => [
-                [
+            ),
+            'missing custom dist file' => array(
+                array(
                     'file'      => 'fixtures/json/invalid/missing.json',
                     'dist-file' => 'fixtures/json/invalid/non-existent.dist.json',
-                ],
+                ),
                 'The dist file "fixtures/json/invalid/non-existent.dist.json" does not exist. Check your dist-file config or create it.',
-            ],
-            'missing top level key in dist file' => [
-                [
+            ),
+            'missing top level key in dist file' => array(
+                array(
                     'file' => 'fixtures/json/invalid/missing_top_level.json',
-                ],
+                ),
                 'The top-level key parameters is missing.',
-            ],
-            'invalid values in the existing file' => [
-                [
+            ),
+            'invalid values in the existing file' => array(
+                array(
                     'file' => 'fixtures/json/invalid/invalid_existing_values.json',
-                ],
+                ),
                 'The existing "fixtures/json/invalid/invalid_existing_values.json" file does not contain an array',
-            ],
-        ];
+            ),
+        );
     }
 
     /**
