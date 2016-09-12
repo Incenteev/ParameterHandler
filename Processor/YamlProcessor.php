@@ -4,7 +4,7 @@ namespace Incenteev\ParameterHandler\Processor;
 
 use Symfony\Component\Yaml\Yaml;
 
-class YamlProcessor extends AbstractProcessor implements ProcessorInterface
+class YamlProcessor extends AbstractProcessor
 {
     /**
      * Persists an array to a file in YAML format.

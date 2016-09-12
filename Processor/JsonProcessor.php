@@ -2,7 +2,7 @@
 
 namespace Incenteev\ParameterHandler\Processor;
 
-class JsonProcessor extends AbstractProcessor implements ProcessorInterface
+class JsonProcessor extends AbstractProcessor
 {
     /**
      * Persists an array to a file in JSON format.
