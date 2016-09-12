@@ -11,7 +11,7 @@ use Symfony\Component\Yaml\Yaml;
 class JsonProcessorTest extends ProphecyTestCase
 {
     private $io;
-    private $environmentBackup = [];
+    private $environmentBackup = array();
 
     /**
      * @var Processor
@@ -96,7 +96,7 @@ class JsonProcessorTest extends ProphecyTestCase
                     'file' => 'parameters.json',
                 ],
                 'dist-file'   => 'parameters.json.dist',
-                'environment' => [],
+                'environment' => array(),
                 'interactive' => false,
             ],
             (array) Yaml::parse(file_get_contents($dataDir.'/setup.yml'))
@@ -160,7 +160,7 @@ class JsonProcessorTest extends ProphecyTestCase
 
     public function provideParameterHandlingTestCases()
     {
-        $tests = [];
+        $tests = array();
 
         foreach (glob(__DIR__.'/fixtures/json/testcases/*/') as $folder) {
             $tests[] = [basename($folder)];
