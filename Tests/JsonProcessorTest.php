@@ -163,7 +163,7 @@ class JsonProcessorTest extends ProphecyTestCase
         $tests = array();
 
         foreach (glob(__DIR__.'/fixtures/json/testcases/*/') as $folder) {
-            $tests[] = [basename($folder)];
+            $tests[] = array(basename($folder));
         }
 
         return $tests;
