@@ -21,7 +21,7 @@ class JsonParser implements ParserInterface
         if ('' === $value) {
             $result = array();
         } else {
-            $result = json_decode($value, $assoc, $depth, $flags);
+            $result = json_decode($value, $assoc, $depth);
             if (null === $result) {
                 $result = false;
             }
