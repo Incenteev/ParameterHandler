@@ -90,15 +90,15 @@ class JsonProcessorTest extends ProphecyTestCase
         $dataDir = __DIR__.'/fixtures/json/testcases/'.$testCaseName;
 
         $testCase = array_replace_recursive(
-            [
+            array(
                 'title'  => 'unknown test',
-                'config' => [
+                'config' => array(
                     'file' => 'parameters.json',
-                ],
+                ),
                 'dist-file'   => 'parameters.json.dist',
                 'environment' => array(),
                 'interactive' => false,
-            ],
+            ),
             (array) Yaml::parse(file_get_contents($dataDir.'/setup.yml'))
         );
 
