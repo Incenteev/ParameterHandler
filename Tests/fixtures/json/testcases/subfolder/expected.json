@@ -1,0 +1,6 @@
+{
+  "parameters": {
+    "foo": "existing_foo",
+    "boolean": false
+  }
+}
