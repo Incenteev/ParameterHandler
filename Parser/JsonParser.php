@@ -19,7 +19,7 @@ class JsonParser implements ParserInterface
     public function parse($value, $flags = 0, $assoc = true, $depth = 512)
     {
         if ('' === $value) {
-            $result = [];
+            $result = array();
         } else {
             $result = json_decode($value, $assoc, $depth, $flags);
             if (null === $result) {
