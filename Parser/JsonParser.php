@@ -115,7 +115,7 @@ class JsonParser implements ParserInterface
         $result = trim($result);
 
         if (true === $newLineAtEof) {
-            $result .= PHP_EOL;
+            $result .= "\n";
         }
 
         return $result;
