@@ -43,10 +43,10 @@ class ScriptHandler
      *
      * @var array
      */
-    protected static $handable = [
+    protected static $handable = array(
         self::CONFIGURATION_FORMAT_YAML,
         self::CONFIGURATION_FORMAT_JSON,
-    ];
+    );
 
     public static function buildParameters(Event $event)
     {
@@ -63,7 +63,7 @@ class ScriptHandler
         }
 
         if (array_keys($configs) !== range(0, count($configs) - 1)) {
-            $configs = [$configs];
+            $configs = array($configs);
         }
 
         foreach ($configs as $config) {
