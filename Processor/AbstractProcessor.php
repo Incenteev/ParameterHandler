@@ -64,12 +64,12 @@ abstract class AbstractProcessor
         $actualValues = array_merge(
         // Preserve other top-level keys than `$parameterKey` in the file
             $expectedValues,
-            [$parameterKey => []]
+            array($parameterKey => array())
         );
         if ($exists) {
             $existingValues = $this->parser->parse(file_get_contents($realFile));
             if ($existingValues === null) {
-                $existingValues = [];
+                $existingValues = array();
             }
             if (!is_array($existingValues)) {
                 throw new \InvalidArgumentException(sprintf('The existing "%s" file does not contain an array', $realFile));
@@ -115,7 +115,7 @@ abstract class AbstractProcessor
     protected function processParams(array $config, array $expectedParams, array $actualParams)
     {
         // Grab values for parameters that were renamed
-        $renameMap    = empty($config['rename-map']) ? [] : (array) $config['rename-map'];
+        $renameMap    = empty($config['rename-map']) ? array() : (array) $config['rename-map'];
         $actualParams = array_replace($actualParams, $this->processRenamedValues($renameMap, $actualParams));
 
         $keepOutdatedParams = false;
@@ -127,7 +127,7 @@ abstract class AbstractProcessor
             $actualParams = array_intersect_key($actualParams, $expectedParams);
         }
 
-        $envMap = empty($config['env-map']) ? [] : (array) $config['env-map'];
+        $envMap = empty($config['env-map']) ? array() : (array) $config['env-map'];
 
         // Add the params coming from the environment values
         $actualParams = array_replace($actualParams, $this->getEnvValues($envMap));
@@ -146,7 +146,7 @@ abstract class AbstractProcessor
      */
     protected function getEnvValues(array $envMap)
     {
-        $params = [];
+        $params = array();
         foreach ($envMap as $param => $env) {
             $value = getenv($env);
             if ($value) {

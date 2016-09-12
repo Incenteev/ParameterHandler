@@ -132,7 +132,7 @@ class YamlProcessorTest extends ProphecyTestCase
         foreach ($testCase['environment'] as $var => $value) {
             $this->environmentBackup[$var] = getenv($var);
             putenv($var.'='.$value);
-        };
+        }
 
         chdir($workingDir);
 
