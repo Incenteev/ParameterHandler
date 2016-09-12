@@ -96,17 +96,12 @@ class ScriptHandler
     }
 
     /**
-     * Returns type of configuration by file extension.
-     *
-     * @example Files with extension ".yml" will be resolved to type YAML, extension ".json" will be resolved to type JSON
+     * Returns type of configuration by files extension.
+     * Files with extension ".yml" will be resolved to type YAML, extension ".json" will be resolved to type JSON
      *
      * @param string $file File to parse extension from
      *
-     * @author Benjamin Carl <opensource@clickalicious.de>
-     *
      * @return string Type of configuration, either self::FILE_TYPE_YAML or self::FILE_TYPE_JSON
-     *
-     * @throws \OutOfBoundsException
      */
     private static function retrieveConfigurationTypeByFile($file)
     {

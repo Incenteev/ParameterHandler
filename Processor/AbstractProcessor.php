@@ -3,14 +3,14 @@
 namespace Incenteev\ParameterHandler\Processor;
 
 use Composer\IO\IOInterface;
-use Incenteev\ParameterHandler\Parser\JsonParser;
-use Symfony\Component\Yaml\Parser as YamlParser;
+use Incenteev\ParameterHandler\Parser\ParseException;
+use Incenteev\ParameterHandler\Parser\ParserInterface;
 use Symfony\Component\Yaml\Inline;
 
 abstract class AbstractProcessor
 {
     /**
-     * IO Interface of composer used for displaying messages.
+     * IO Interface of composer used for displaying messages and requesting input from user.
      *
      * @var IOInterface
      */
@@ -19,26 +19,26 @@ abstract class AbstractProcessor
     /**
      * Parser.
      *
-     * @var IOInterface
+     * @var ParserInterface
      */
     protected $parser;
 
     /**
      * Constructor.
      *
-     * @param IOInterface           $io     Composer IO Interface
-     * @param YamlParser|JsonParser $parser Instance of parser to parse configuration
+     * @param IOInterface     $io     Composer IO
+     * @param ParserInterface $parser Instance of parser for type YAML or JSON
      */
-    public function __construct(IOInterface $io, $parser)
+    public function __construct(IOInterface $io, ParserInterface $parser)
     {
         $this->parser = $parser;
         $this->io     = $io;
     }
 
     /**
-     * {@inheritdoc}
+     * Aloha
      *
-     * @throws \InvalidArgumentException|\RuntimeException
+     * @throws ParseException|\InvalidArgumentException|\RuntimeException
      */
     public function processFile(array $config)
     {
@@ -174,6 +174,16 @@ abstract class AbstractProcessor
         return $actualParams;
     }
 
+    /**
+     * Returns the current set of parameters.
+     * If IO mode non interactive it simply sets the expected values, otherwise it asks user for defining missing
+     * parameters.
+     *
+     * @param array $expectedParams Parameters required
+     * @param array $actualParams   Parameters defined already
+     *
+     * @return array Updated set of parameters
+     */
     private function getParams(array $expectedParams, array $actualParams)
     {
         // Simply use the expectedParams value as default for the missing params.
@@ -207,7 +217,7 @@ abstract class AbstractProcessor
      * Persists configuration.
      *
      * @param string $file          Filename to persist configuration to.
-     * @param array  $configuration Configuration to persist as an array.
+     * @param array  $configuration Configuration to persist.
      *
      * @return bool TRUE after successful persisting the file, otherwise FALSE
      */
