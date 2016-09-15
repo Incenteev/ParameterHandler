@@ -10,11 +10,18 @@ use Symfony\Component\Yaml\Yaml;
 
 class YamlProcessorTest extends ProphecyTestCase
 {
+    /**
+     * @var \Composer\IO\IOInterface
+     */
     private $io;
+
+    /**
+     * @var array
+     */
     private $environmentBackup = array();
 
     /**
-     * @var Processor
+     * @var YamlProcessor
      */
     private $processor;
 

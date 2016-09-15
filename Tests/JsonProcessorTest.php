@@ -10,11 +10,18 @@ use Symfony\Component\Yaml\Yaml;
 
 class JsonProcessorTest extends ProphecyTestCase
 {
+    /**
+     * @var \Composer\IO\IOInterface
+     */
     private $io;
+
+    /**
+     * @var array
+     */
     private $environmentBackup = array();
 
     /**
-     * @var Processor
+     * @var JsonProcessor
      */
     private $processor;
 

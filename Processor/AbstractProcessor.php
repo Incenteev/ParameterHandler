@@ -36,7 +36,7 @@ abstract class AbstractProcessor
     }
 
     /**
-     * Aloha
+     * Processes single operations for a passed parameter file configuration.
      *
      * @throws ParseException|\InvalidArgumentException|\RuntimeException
      */
@@ -183,6 +183,8 @@ abstract class AbstractProcessor
      * @param array $actualParams   Parameters defined already
      *
      * @return array Updated set of parameters
+     *
+     * @throws \RuntimeException
      */
     private function getParams(array $expectedParams, array $actualParams)
     {

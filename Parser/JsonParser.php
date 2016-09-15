@@ -13,8 +13,6 @@ class JsonParser implements ParserInterface
      * @param int    $depth User specified recursion depth.
      *
      * @return mixed A PHP value
-     *
-     * @throws ParseException On any error parsing the JSON data.
      */
     public function parse($value, $flags = 0, $assoc = true, $depth = 512)
     {
