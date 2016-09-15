@@ -1,0 +1,14 @@
+{
+  "parameters": {
+    "boolean": true,
+    "another": null,
+    "nested": {
+      "foo": "bar",
+      "bar": [
+        "foo",
+        "test",
+        null
+      ]
+    }
+  }
+}

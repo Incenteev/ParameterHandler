@@ -2,18 +2,26 @@
 
 namespace Incenteev\ParameterHandler\Tests;
 
-use Incenteev\ParameterHandler\Processor;
+use Incenteev\ParameterHandler\Parser\YamlParser;
+use Incenteev\ParameterHandler\Processor\YamlProcessor;
 use Prophecy\PhpUnit\ProphecyTestCase;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Yaml\Yaml;
 
-class ProcessorTest extends ProphecyTestCase
+class YamlProcessorTest extends ProphecyTestCase
 {
+    /**
+     * @var \Composer\IO\IOInterface
+     */
     private $io;
+
+    /**
+     * @var array
+     */
     private $environmentBackup = array();
 
     /**
-     * @var Processor
+     * @var YamlProcessor
      */
     private $processor;
 
@@ -22,7 +30,7 @@ class ProcessorTest extends ProphecyTestCase
         parent::setUp();
 
         $this->io = $this->prophesize('Composer\IO\IOInterface');
-        $this->processor = new Processor($this->io->reveal());
+        $this->processor = new YamlProcessor($this->io->reveal(), new YamlParser());
     }
 
     protected function tearDown()
@@ -53,34 +61,30 @@ class ProcessorTest extends ProphecyTestCase
     public function provideInvalidConfiguration()
     {
         return array(
-            'no file' => array(
-                array(),
-                'The extra.incenteev-parameters.file setting is required to use this script handler.',
-            ),
             'missing default dist file' => array(
                 array(
-                    'file' => 'fixtures/invalid/missing.yml',
+                    'file' => 'fixtures/yaml/invalid/missing.yml',
                 ),
-                'The dist file "fixtures/invalid/missing.yml.dist" does not exist. Check your dist-file config or create it.',
+                'The dist file "fixtures/yaml/invalid/missing.yml.dist" does not exist. Check your dist-file config or create it.',
             ),
             'missing custom dist file' => array(
                 array(
-                    'file' => 'fixtures/invalid/missing.yml',
-                    'dist-file' => 'fixtures/invalid/non-existent.dist.yml',
+                    'file' => 'fixtures/yaml/invalid/missing.yml',
+                    'dist-file' => 'fixtures/yaml/invalid/non-existent.dist.yml',
                 ),
-                'The dist file "fixtures/invalid/non-existent.dist.yml" does not exist. Check your dist-file config or create it.',
+                'The dist file "fixtures/yaml/invalid/non-existent.dist.yml" does not exist. Check your dist-file config or create it.',
             ),
             'missing top level key in dist file' => array(
                 array(
-                    'file' => 'fixtures/invalid/missing_top_level.yml',
+                    'file' => 'fixtures/yaml/invalid/missing_top_level.yml',
                 ),
                 'The top-level key parameters is missing.',
             ),
             'invalid values in the existing file' => array(
                 array(
-                    'file' => 'fixtures/invalid/invalid_existing_values.yml',
+                    'file' => 'fixtures/yaml/invalid/invalid_existing_values.yml',
                 ),
-                'The existing "fixtures/invalid/invalid_existing_values.yml" file does not contain an array',
+                'The existing "fixtures/yaml/invalid/invalid_existing_values.yml" file does not contain an array',
             ),
         );
     }
@@ -90,7 +94,7 @@ class ProcessorTest extends ProphecyTestCase
      */
     public function testParameterHandling($testCaseName)
     {
-        $dataDir = __DIR__.'/fixtures/testcases/'.$testCaseName;
+        $dataDir = __DIR__.'/fixtures/yaml/testcases/'.$testCaseName;
 
         $testCase = array_replace_recursive(
             array(
@@ -135,7 +139,7 @@ class ProcessorTest extends ProphecyTestCase
         foreach ($testCase['environment'] as $var => $value) {
             $this->environmentBackup[$var] = getenv($var);
             putenv($var.'='.$value);
-        };
+        }
 
         chdir($workingDir);
 
@@ -165,7 +169,7 @@ class ProcessorTest extends ProphecyTestCase
     {
         $tests = array();
 
-        foreach (glob(__DIR__.'/fixtures/testcases/*/') as $folder) {
+        foreach (glob(__DIR__.'/fixtures/yaml/testcases/*/') as $folder) {
             $tests[] = array(basename($folder));
         }
 

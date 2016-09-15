@@ -1,0 +1,6 @@
+{
+  "parameters": {
+    "foo": "existing_foo",
+    "outdated": "outdated_param"
+  }
+}

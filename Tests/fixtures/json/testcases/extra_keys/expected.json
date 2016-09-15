@@ -1,0 +1,8 @@
+{
+  "parameters": {
+    "foo": "existing_foo",
+    "boolean": false
+  },
+  "extra_key": "a new extra key",
+  "another_key": "foo"
+}

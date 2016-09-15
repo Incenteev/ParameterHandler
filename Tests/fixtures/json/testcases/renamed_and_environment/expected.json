@@ -1,0 +1,6 @@
+{
+  "parameters": {
+    "new": "new_env_value",
+    "new2": "old_value2"
+  }
+}

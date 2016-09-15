@@ -7,8 +7,19 @@ use Prophecy\PhpUnit\ProphecyTestCase;
 
 class ScriptHandlerTest extends ProphecyTestCase
 {
+    /**
+     * @var \Composer\Script\Event
+     */
     private $event;
+
+    /**
+     * @var \Composer\IO\IOInterface
+     */
     private $io;
+
+    /**
+     * @var \Composer\Package\PackageInterface
+     */
     private $package;
 
     protected function setUp()
@@ -18,6 +29,7 @@ class ScriptHandlerTest extends ProphecyTestCase
         $this->event = $this->prophesize('Composer\Script\Event');
         $this->io = $this->prophesize('Composer\IO\IOInterface');
         $this->package = $this->prophesize('Composer\Package\PackageInterface');
+        /* @var $composer \Composer\Composer */
         $composer = $this->prophesize('Composer\Composer');
 
         $composer->getPackage()->willReturn($this->package);
