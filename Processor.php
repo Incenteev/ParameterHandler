@@ -113,7 +113,7 @@ class Processor
         foreach ($envMap as $param => $env) {
             $value = getenv($env);
             if ($value) {
-                $params[$param] = Inline::parse($value);
+                $params[$param] = Yaml::parse($value);
             }
         }
 
