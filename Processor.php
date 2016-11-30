@@ -112,12 +112,32 @@ class Processor
         $params = array();
         foreach ($envMap as $param => $env) {
             $value = getenv($env);
-            if ($value) {
-                $params[$param] = Inline::parse($value);
+
+            if (!$value) {
+                continue;
             }
+
+            if (false !== strpos($param, '.')) {
+                $this->setValueByPath($params, $param, Inline::parse($value));
+
+                continue;
+            }
+
+            $params[$param] = Inline::parse($value);
         }
 
         return $params;
+    }
+
+    private function setValueByPath(array &$array, $path, $value)
+    {
+        $index = &$array;
+
+        foreach(explode('.', $path) as $level) {
+            $index = &$index[$level];
+        }
+
+        $index = $value;
     }
 
     private function processRenamedValues(array $renameMap, array $actualParams)

@@ -4,10 +4,12 @@ config:
     env-map:
         boolean: IC_TEST_BOOL
         nested: IC_TEST_NESTED
+        more.nested.param: IC_TEST_MORE
 
 environment:
     IC_TEST_BOOL: 'true'
     IC_TEST_NESTED: '{foo: env_foo, bar: [env, test, null]}'
+    IC_TEST_MORE: 'barfoo'
 
 interactive: true
 

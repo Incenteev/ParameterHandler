@@ -2,3 +2,6 @@ parameters:
     boolean: false
     another: test
     nested: nested
+    more:
+        nested:
+            param: foobar
