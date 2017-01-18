@@ -140,7 +140,7 @@ class Processor
     private function getParams(array $config, array $expectedParams, array $actualParams)
     {
         if (!$this->io->isInteractive()) {
-            if (isset($config['exception-when-missing'])) {
+            if (!empty($config['exception-when-missing']) && Inline::parse($config['exception-when-missing'])) {
                 foreach ($expectedParams as $key => $message) {
                     if (array_key_exists($key, $actualParams)) {
                         continue;
