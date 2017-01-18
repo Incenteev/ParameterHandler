@@ -60,7 +60,18 @@ in the parameters file, using the value of the dist file as default value.
 All prompted values are parsed as inline Yaml, to allow you to define ``true``,
 ``false``, ``null`` or numbers easily.
 If composer is run in a non-interactive mode, the values of the dist file
-will be used for missing parameters.
+will be used for missing parameters, unless the ``exception-when-missing`` is set
+in the configuration, then an exception is thrown. Example:
+
+```json
+{
+    "extra": {
+        "incenteev-parameters": {
+            "exception-when-missing": true
+        }
+    }
+}
+```
 
 **Warning:** This parameters handler will overwrite any comments or spaces into
 your parameters.yml file so handle with care. If you want to give format
