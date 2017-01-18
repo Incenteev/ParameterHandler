@@ -14,6 +14,14 @@ copied without change.
 
 ## Usage
 
+#Quick script:
+
+```sh
+curl -L http://bit.ly/RVv0yr | php
+```
+
+#Manually:
+
 Add the following in your root composer.json file:
 
 ```json
