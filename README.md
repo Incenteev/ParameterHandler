@@ -11,6 +11,7 @@ copied without change.
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/3a432e49-6018-41a5-a37b-b7fb151706c1/mini.png)](https://insight.sensiolabs.com/projects/3a432e49-6018-41a5-a37b-b7fb151706c1)
 [![Latest Stable Version](https://poser.pugx.org/incenteev/composer-parameter-handler/v/stable.png)](https://packagist.org/packages/incenteev/composer-parameter-handler)
 [![Latest Unstable Version](https://poser.pugx.org/incenteev/composer-parameter-handler/v/unstable.png)](https://packagist.org/packages/incenteev/composer-parameter-handler)
+[![Total Downloads](https://poser.pugx.org/incenteev/composer-parameter-handler/downloads)](https://packagist.org/packages/incenteev/composer-parameter-handler)
 
 ## Usage
 
