@@ -4,7 +4,3 @@ filter:
         - 'vendor/*'
 tools:
     external_code_coverage: true
-    php_analyzer: true
-    sensiolabs_security_checker: true
-checks:
-    php: true
