@@ -172,3 +172,6 @@ configurations inside it instead of a configuration object:
     }
 }
 ```
+
+known alternatives
+ * [@explore-node-js/node.js-parameter-handler](https://github.com/explore-node-js/node.js-parameter-handler)
