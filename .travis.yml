@@ -15,7 +15,10 @@ matrix:
         - php: 5.6
         - php: 7.0
           env: DEPENDENCIES=dev
+        - php: 7.1
+          env: DEPENDENCIES=dev
         - php: hhvm
+          dist: trusty
 
 before_script:
     - if [ "$DEPENDENCIES" = "dev" ]; then perl -pi -e 's/^}$/,"minimum-stability":"dev"}/' composer.json; fi;
