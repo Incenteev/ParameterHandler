@@ -171,4 +171,34 @@ class ProcessorTest extends ProphecyTestCase
 
         return $tests;
     }
+
+    public function testNoDev()
+    {
+        $dataDir = __DIR__.'/fixtures/dev_only';
+
+        $testCase = array_replace_recursive(
+            array(
+                'title' => 'unknown test',
+                'config' => array(
+                    'file' => 'parameters.yml',
+                ),
+                'dist-file' => 'parameters.yml.dist',
+                'environment' => array(),
+                'interactive' => false,
+            ),
+            (array) Yaml::parse(file_get_contents($dataDir.'/setup.yml'))
+        );
+
+        $workingDir = sys_get_temp_dir() . '/incenteev_parameter_handler';
+        $this->initializeTestCase($testCase, $dataDir, $workingDir);
+
+        $message = sprintf('<info>Skipping the "%s" file</info>', $testCase['config']['file']);
+        $this->io->write($message)->shouldBeCalled();
+
+        $this->setInteractionExpectations($testCase);
+
+        $this->processor->processFile($testCase['config'], false);
+
+        $this->assertFileEquals($dataDir.'/expected.yml', $workingDir.'/'.$testCase['config']['file'], $testCase['title']);
+    }
 }

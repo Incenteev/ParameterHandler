@@ -149,6 +149,24 @@ If the old parameter is no longer present (maybe because it has been renamed and
 removed already), no parameters are overwritten. You don't need to remove obsolete
 parameters from the rename map once they have been renamed.
 
+### Skipping file in production mode
+
+You can enable the parameter handler only in development mode:
+
+```json
+{
+    "extra": {
+        "incenteev-parameters": {
+            "dev-only": true
+        }
+    }
+}
+
+```
+
+Doing that, calling composer with `--no-dev` flag will disable the parameter
+handler.
+
 ### Managing multiple ignored files
 
 The parameter handler can manage multiple ignored files. To use this feature,
