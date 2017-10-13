@@ -1,8 +1,8 @@
 <?php
 
-namespace Incenteev\ParameterHandler\Tests;
+namespace Serrvius\ParameterHandler\Tests;
 
-use Incenteev\ParameterHandler\ScriptHandler;
+use Serrvius\ParameterHandler\ScriptHandler;
 use Prophecy\PhpUnit\ProphecyTestCase;
 
 class ScriptHandlerTest extends ProphecyTestCase

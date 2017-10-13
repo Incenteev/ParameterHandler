@@ -1,6 +1,6 @@
 <?php
 
-namespace Incenteev\ParameterHandler;
+namespace Serrvius\ParameterHandler;
 
 use Composer\IO\IOInterface;
 use Symfony\Component\Yaml\Inline;
@@ -10,6 +10,10 @@ use Symfony\Component\Yaml\Yaml;
 class Processor
 {
     private $io;
+
+    private $isStarted = false;
+
+    private $isRecursive = false;
 
     public function __construct(IOInterface $io)
     {
@@ -22,6 +26,7 @@ class Processor
 
         $realFile = $config['file'];
         $parameterKey = $config['parameter-key'];
+        $parametersGroup = isset($config['parameters-group']) ? $config['parameters-group'] : array();
 
         $exists = is_file($realFile);
 
@@ -32,17 +37,26 @@ class Processor
 
         // Find the expected params
         $expectedValues = $yamlParser->parse(file_get_contents($config['dist-file']));
-        if (!isset($expectedValues[$parameterKey])) {
-            throw new \InvalidArgumentException(sprintf('The top-level key %s is missing.', $parameterKey));
+        if (!isset($expectedValues[$parameterKey]) && empty($parametersGroup)) {
+            throw new \InvalidArgumentException(sprintf('Both top-level keys [%s] and [parameters-group] is missing.', $parameterKey));
         }
-        $expectedParams = (array) $expectedValues[$parameterKey];
+
+        $expectedParams = array();
+        if(isset($expectedValues[$parameterKey])) {
+            $expectedParams[$parameterKey] = (array) $expectedValues[$parameterKey];
+        }else {
+          foreach ($parametersGroup as $groupKey) {
+            $expectedParams[$groupKey] = (array) $expectedValues[$groupKey];
+          }
+        }
 
         // find the actual params
         $actualValues = array_merge(
             // Preserve other top-level keys than `$parameterKey` in the file
             $expectedValues,
-            array($parameterKey => array())
+            array_combine(array_keys($expectedParams),array_fill(1,count($expectedParams),array()))
         );
+
         if ($exists) {
             $existingValues = $yamlParser->parse(file_get_contents($realFile));
             if ($existingValues === null) {
@@ -54,7 +68,9 @@ class Processor
             $actualValues = array_merge($actualValues, $existingValues);
         }
 
-        $actualValues[$parameterKey] = $this->processParams($config, $expectedParams, (array) $actualValues[$parameterKey]);
+        foreach (array_keys($expectedParams) as $parameterKey) {
+            $actualValues[$parameterKey] = $this->processParams($config, $expectedParams[$parameterKey], (array) $actualValues[$parameterKey],$parameterKey);
+        }
 
         if (!is_dir($dir = dirname($realFile))) {
             mkdir($dir, 0755, true);
@@ -81,10 +97,14 @@ class Processor
             $config['parameter-key'] = 'parameters';
         }
 
+        if(isset($config['recursive'])){
+          $this->isRecursive = (bool)$config['recursive'];
+        }
+
         return $config;
     }
 
-    private function processParams(array $config, array $expectedParams, array $actualParams)
+    private function processParams(array $config, array $expectedParams, array $actualParams,$currentKey = '')
     {
         // Grab values for parameters that were renamed
         $renameMap = empty($config['rename-map']) ? array() : (array) $config['rename-map'];
@@ -104,7 +124,7 @@ class Processor
         // Add the params coming from the environment values
         $actualParams = array_replace($actualParams, $this->getEnvValues($envMap));
 
-        return $this->getParams($expectedParams, $actualParams);
+        return $this->getParams($expectedParams, $actualParams, array($currentKey));
     }
 
     private function getEnvValues(array $envMap)
@@ -137,29 +157,31 @@ class Processor
         return $actualParams;
     }
 
-    private function getParams(array $expectedParams, array $actualParams)
+    private function getParams(array $expectedParams, array $actualParams, array $breadcrumbs = array())
     {
         // Simply use the expectedParams value as default for the missing params.
         if (!$this->io->isInteractive()) {
             return array_replace($expectedParams, $actualParams);
         }
 
-        $isStarted = false;
-
         foreach ($expectedParams as $key => $message) {
             if (array_key_exists($key, $actualParams)) {
                 continue;
             }
 
-            if (!$isStarted) {
-                $isStarted = true;
+            if (!$this->isStarted) {
+                $this->isStarted = true;
                 $this->io->write('<comment>Some parameters are missing. Please provide them.</comment>');
             }
 
-            $default = Inline::dump($message);
-            $value = $this->io->ask(sprintf('<question>%s</question> (<comment>%s</comment>): ', $key, $default), $default);
+            if($this->isRecursive && is_array($expectedParams[$key])){
+              $actualParams[$key] = $this->getParams($expectedParams[$key],isset($actualParams[$key]) ? $actualParams[$key] : array(), array_merge($breadcrumbs,array($key)));
+            }else {
+              $default = Inline::dump($message);
+              $value   = $this->io->ask(sprintf('<question>[%s]%s</question> (<comment>%s</comment>): ', implode('][',$breadcrumbs),$key, $default), $default);
 
-            $actualParams[$key] = Inline::parse($value);
+              $actualParams[$key] = Inline::parse($value);
+            }
         }
 
         return $actualParams;

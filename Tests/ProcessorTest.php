@@ -1,8 +1,8 @@
 <?php
 
-namespace Incenteev\ParameterHandler\Tests;
+namespace Serrvius\ParameterHandler\Tests;
 
-use Incenteev\ParameterHandler\Processor;
+use Serrvius\ParameterHandler\Processor;
 use Prophecy\PhpUnit\ProphecyTestCase;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Yaml\Yaml;

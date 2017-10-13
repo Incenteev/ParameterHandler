@@ -1,3 +1,9 @@
+## 2.1.5 (2017-10-14) 
+ `(by serrvius)`
+* Added group of primary keys
+* Added recursive key processing 
+* Added config prefix
+
 ## 2.1.2 (2015-11-10)
 
 * Mark symfony/yaml 3 as supported to be compatible with Symfony 3

@@ -1,6 +1,6 @@
 <?php
 
-namespace Incenteev\ParameterHandler;
+namespace Serrvius\ParameterHandler;
 
 use Composer\Script\Event;
 
