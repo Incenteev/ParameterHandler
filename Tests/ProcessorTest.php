@@ -3,11 +3,11 @@
 namespace Incenteev\ParameterHandler\Tests;
 
 use Incenteev\ParameterHandler\Processor;
-use Prophecy\PhpUnit\ProphecyTestCase;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Yaml\Yaml;
 
-class ProcessorTest extends ProphecyTestCase
+class ProcessorTest extends TestCase
 {
     private $io;
     private $environmentBackup = array();
