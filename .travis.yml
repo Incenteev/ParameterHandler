@@ -10,6 +10,7 @@ cache:
 env:
     global:
         - SYMFONY_PHPUNIT_DIR=$HOME/.phpunit-bridge
+        - SYMFONY_PHPUNIT_REMOVE='' # don't remove prophecy
 
 php: [7.2, 7.1, 7.0, 5.6, 5.5, 5.4]
 
