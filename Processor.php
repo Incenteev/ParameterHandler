@@ -31,7 +31,7 @@ class Processor
         $this->io->write(sprintf('<info>%s the "%s" file</info>', $action, $realFile));
 
         // Find the expected params
-        $expectedValues = $yamlParser->parse(file_get_contents($config['dist-file']));
+        $expectedValues = $yamlParser->parse(file_get_contents($config['dist-file']), Yaml::PARSE_CONSTANT);
         if (!isset($expectedValues[$parameterKey])) {
             throw new \InvalidArgumentException(sprintf('The top-level key %s is missing.', $parameterKey));
         }
@@ -44,7 +44,7 @@ class Processor
             array($parameterKey => array())
         );
         if ($exists) {
-            $existingValues = $yamlParser->parse(file_get_contents($realFile));
+            $existingValues = $yamlParser->parse(file_get_contents($realFile), Yaml::PARSE_CONSTANT);
             if ($existingValues === null) {
                 $existingValues = array();
             }
