@@ -11,13 +11,13 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3",
-        "symfony/yaml": "^2.3 || ^3.0 || ^4.0"
+        "php": ">=7.1",
+        "symfony/yaml": "^3.4 || ^4.2"
     },
     "require-dev": {
         "composer/composer": "^1.0@dev",
-        "symfony/filesystem": "^2.3 || ^3 || ^4",
-        "symfony/phpunit-bridge": "^4.0"
+        "symfony/filesystem": "^3.4 || ^4.2",
+        "symfony/phpunit-bridge": "^4.2"
     },
     "autoload": {
         "psr-4": { "Incenteev\\ParameterHandler\\": "" }
