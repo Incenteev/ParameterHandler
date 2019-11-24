@@ -11,7 +11,7 @@ class ScriptHandlerTest extends TestCase
     private $io;
     private $package;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

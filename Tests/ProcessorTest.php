@@ -17,7 +17,7 @@ class ProcessorTest extends TestCase
      */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -25,7 +25,7 @@ class ProcessorTest extends TestCase
         $this->processor = new Processor($this->io->reveal());
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
 
