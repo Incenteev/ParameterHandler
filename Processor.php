@@ -141,12 +141,13 @@ class Processor
     {
         // Simply use the expectedParams value as default for the missing params.
         if (!$this->io->isInteractive()) {
-            return array_replace($expectedParams, $actualParams);
+            return array_replace_recursive($expectedParams, $actualParams);
         }
 
         $isStarted = false;
+        $diffParams = self::arrayDiffKeyRecursive($expectedParams, $actualParams);
 
-        foreach ($expectedParams as $key => $message) {
+        foreach ($diffParams as $key => $message) {
             if (array_key_exists($key, $actualParams)) {
                 continue;
             }
@@ -159,9 +160,37 @@ class Processor
             $default = Inline::dump($message);
             $value = $this->io->ask(sprintf('<question>%s</question> (<comment>%s</comment>): ', $key, $default), $default);
 
-            $actualParams[$key] = Inline::parse($value);
+            if (array_key_exists($key, $actualParams)) {
+                $actualParams[$key] = array_merge($actualParams[$key], Inline::parse($value));
+            } else {
+                $actualParams[$key] = Inline::parse($value);
+            }
         }
 
         return $actualParams;
+    }
+
+    /**
+     * Return recursive diff based on keys
+     * @param  array  $arr1 [description]
+     * @param  array  $arr2 [description]
+     * @return [type]       [description]
+     */
+    private static function arrayDiffKeyRecursive(array $arr1, array $arr2)
+    {
+        $diff = array_diff_key($arr1, $arr2);
+        $intersect = array_intersect_key($arr1, $arr2);
+
+        foreach ($intersect as $k => $v) {
+            if (is_array($arr1[$k]) && is_array($arr2[$k])) {
+                $d = self::arrayDiffKeyRecursive($arr1[$k], $arr2[$k]);
+                
+                if ($d) {
+                    $diff[$k] = $d;
+                }
+            }
+        }
+
+        return $diff;
     }
 }
