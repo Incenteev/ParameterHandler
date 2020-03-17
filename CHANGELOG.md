@@ -1,3 +1,7 @@
+## 2.1.4 (2020-03-17)
+
+* Mark symfony/yaml 5 as supported
+
 ## 2.1.3 (2018-02-13)
 
 * Mark symfony/yaml 4 as supported to be compatible with Symfony 4
