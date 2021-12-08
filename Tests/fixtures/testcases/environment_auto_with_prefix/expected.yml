@@ -1,0 +1,12 @@
+# This file is auto-generated during the composer install
+parameters:
+    boolean: true
+    another: null
+    nested:
+        foo: env_foo
+        bar:
+            - env
+            - test
+            - null
+    foo_baz: foo_baz
+    foo.baz: foo.baz
