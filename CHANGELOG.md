@@ -1,3 +1,7 @@
+## 2.1.5 (2022-05-25)
+
+* Mark symfony/yaml 6 as supported
+
 ## 2.1.4 (2020-03-17)
 
 * Mark symfony/yaml 5 as supported
