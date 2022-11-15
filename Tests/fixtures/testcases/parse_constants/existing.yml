@@ -1,0 +1,7 @@
+# This file is auto-generated during the composer install
+parameters:
+    transitions:
+        !php/const 'Symfony\Component\Yaml\Yaml::PARSE_CONSTANT':
+            from:
+                - !php/const 'Symfony\Component\Yaml\Yaml::PARSE_CUSTOM_TAGS'
+            to: !php/const 'Symfony\Component\Yaml\Yaml::PARSE_OBJECT'

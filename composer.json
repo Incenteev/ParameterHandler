@@ -22,6 +22,9 @@
     "autoload": {
         "psr-4": { "Incenteev\\ParameterHandler\\": "" }
     },
+	"autoload-dev": {
+		"psr-4": { "Symfony\\Component\\Yaml\\": "" }
+	},
     "extra": {
         "branch-alias": {
             "dev-master": "2.1.x-dev"
