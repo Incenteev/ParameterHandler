@@ -12,13 +12,13 @@
     ],
     "require": {
         "php": ">=7.4",
-        "symfony/yaml": "^5.4 || ^6.0"
+        "symfony/yaml": "^5.4 || ^6.0 || ^7.0"
     },
     "require-dev": {
         "composer/composer": "^2.0@dev",
         "phpspec/prophecy-phpunit": "^2.1",
         "phpunit/phpunit": "^9.6",
-        "symfony/filesystem": "^5.4 || ^6.0",
+        "symfony/filesystem": "^5.4 || ^6.0 || ^7.0",
         "symfony/phpunit-bridge": "^6.4.1 || ^7.0.1"
     },
     "autoload": {
