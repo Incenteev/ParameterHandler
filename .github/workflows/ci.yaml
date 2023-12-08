@@ -23,6 +23,7 @@ jobs:
       SYMFONY_PHPUNIT_REMOVE: '' # don't remove prophecy
       SYMFONY_PHPUNIT_REMOVE_RETURN_TYPEHINT: 1
       SYMFONY_PHPUNIT_REQUIRE: 'phpspec/prophecy:^1.7'
+      SYMFONY_DEPRECATIONS_HELPER: '${{ matrix.symfony_deprecations_helper }}'
 
     strategy:
       fail-fast: false
