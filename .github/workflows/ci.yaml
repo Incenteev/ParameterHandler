@@ -22,6 +22,7 @@ jobs:
     env:
       SYMFONY_PHPUNIT_REMOVE: '' # don't remove prophecy
       SYMFONY_PHPUNIT_REMOVE_RETURN_TYPEHINT: 1
+      SYMFONY_PHPUNIT_REQUIRE: 'phpspec/prophecy:^1.7'
 
     strategy:
       fail-fast: false
@@ -30,6 +31,7 @@ jobs:
         min_stability: [ '' ]
         name_suffix: [ '' ]
         composer_flags: [ '' ]
+        symfony_deprecations_helper: [ 'max[total]=0' ]
         include:
           - php: '8.0'
             min_stability: 'dev'
@@ -38,6 +40,7 @@ jobs:
             min_stability: ''
             name_suffix: ' (lowest deps)'
             composer_flags: '--prefer-lowest --prefer-stable'
+            symfony_deprecations_helper: '999999'
 
     steps:
       -   uses: actions/checkout@v2
