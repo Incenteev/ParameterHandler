@@ -11,20 +11,25 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3",
-        "symfony/yaml": "^2.3 || ^3.0 || ^4.0 || ^5.0 || ^6.0"
+        "php": ">=7.4",
+        "symfony/yaml": "^5.4 || ^6.0"
     },
     "require-dev": {
-        "composer/composer": "^1.0@dev",
-        "symfony/filesystem": "^2.3 || ^3 || ^4 || ^5 || ^6.0",
-        "symfony/phpunit-bridge": "^3.4.47 || ^4.4.41 || ^5.4.8 || ^6.0"
+        "composer/composer": "^2.0@dev",
+        "phpspec/prophecy-phpunit": "^2.1",
+        "phpunit/phpunit": "^9.6",
+        "symfony/filesystem": "^5.4 || ^6.0",
+        "symfony/phpunit-bridge": "^6.4.1 || ^7.0.1"
     },
     "autoload": {
         "psr-4": { "Incenteev\\ParameterHandler\\": "" }
     },
+    "config": {
+        "sort-packages": true
+    },
     "extra": {
         "branch-alias": {
-            "dev-master": "2.1.x-dev"
+            "dev-master": "2.x-dev"
         }
     }
 }
