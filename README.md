@@ -3,7 +3,8 @@
 This tool allows you to manage your ignored parameters when running a composer
 install or update. It works when storing the parameters in a Yaml file under
 a single top-level key (named ``parameters`` by default). Other keys are
-copied without change.
+copied without change. It's obviously possible to nest multi-level parameters
+in your Yaml file.
 
 [![CI](https://github.com/Incenteev/ParameterHandler/actions/workflows/ci.yaml/badge.svg)](https://github.com/Incenteev/ParameterHandler/actions/workflows/ci.yaml)
 [![Latest Stable Version](https://poser.pugx.org/incenteev/composer-parameter-handler/v/stable.png)](https://packagist.org/packages/incenteev/composer-parameter-handler)
