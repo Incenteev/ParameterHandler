@@ -1,0 +1,9 @@
+title: Missing keys in the environment will not cause a throw when the option is set to false
+
+config:
+    env-map:
+        provided: IC_TEST_PROVIDED
+    exception-when-missing: false
+
+environment: 
+    IC_TEST_PROVIDED: bar

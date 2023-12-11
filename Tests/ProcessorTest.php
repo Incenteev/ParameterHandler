@@ -110,6 +110,7 @@ class ProcessorTest extends TestCase
                 'dist-file' => 'parameters.yml.dist',
                 'environment' => array(),
                 'interactive' => false,
+                'expect-exception' => false,
             ),
             (array) Yaml::parse(file_get_contents($dataDir.'/setup.yml'))
         );
@@ -121,6 +122,10 @@ class ProcessorTest extends TestCase
         $this->io->write($message)->shouldBeCalled();
 
         $this->setInteractionExpectations($testCase);
+        
+        if (!empty($testCase['expect-exception'])) {
+            $this->setExpectedException($testCase['expect-exception']);
+        }
 
         $this->processor->processFile($testCase['config']);
 

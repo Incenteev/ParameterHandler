@@ -1,0 +1,11 @@
+title: Missing keys in the environment will cause a throw when the option is set to true
+
+config:
+    env-map:
+        provided: IC_TEST_PROVIDED
+    exception-when-missing: true
+
+environment: 
+    IC_TEST_PROVIDED: bar
+
+expect-exception: "InvalidArgumentException"
