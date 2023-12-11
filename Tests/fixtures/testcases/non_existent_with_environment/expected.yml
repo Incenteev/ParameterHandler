@@ -3,6 +3,7 @@ parameters:
     foo: foobar
     boolean: true
     another: null
+    empty: ''
     nested:
         foo: env_foo
         bar:

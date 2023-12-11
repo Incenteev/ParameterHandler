@@ -2,6 +2,7 @@ parameters:
     foo: bar
     boolean: false
     another: ~
+    empty: nonempty
     nested:
         foo: bar
         bar: baz
