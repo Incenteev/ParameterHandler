@@ -1,0 +1,10 @@
+title: Environment variables win over renamed keys
+
+config:
+    rename-map:
+        ic_test_new: old
+        new2: old2
+    env-map: 'auto'
+
+environment:
+    IC_TEST_NEW: 'new_env_value'

@@ -119,6 +119,35 @@ As environment variables can only be strings, they are also parsed as inline
 Yaml values to allows specifying ``null``, ``false``, ``true`` or numbers
 easily.
 
+#### Using same names for parameters and environment variables
+
+As an alternative, you can set environment variables with the same uppercased
+name of your dist parameters and use ``"env-map": "auto"`` to get an auto mapping.
+``my_first_param`` parameter will map ``MY_FIRST_PARAM`` environment variable.
+
+Given this ``parameters.yml.dist`` file:
+
+```yaml
+# parameters.yml.dist
+
+parameters:
+    my_first_param: "some value"
+    my_second_param: "another value"
+
+```
+
+Following settings will produce the same result as previous example:
+
+```json
+{
+    "extra": {
+        "incenteev-parameters": {
+            "env-map": "auto"
+        }
+    }
+}
+```
+
 ### Renaming parameters
 
 If you are renaming a parameter, the new key will be set according to the usual
