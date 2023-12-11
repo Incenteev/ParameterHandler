@@ -1,0 +1,4 @@
+parameters:
+    foo: bar
+    another: test
+    boolean: true
