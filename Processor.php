@@ -16,12 +16,17 @@ class Processor
         $this->io = $io;
     }
 
-    public function processFile(array $config)
+    public function processFile(array $config, $devMode = true)
     {
         $config = $this->processConfig($config);
 
         $realFile = $config['file'];
         $parameterKey = $config['parameter-key'];
+
+        if ($devMode !== true && !empty($config['dev-only']) && true === $config['dev-only']) {
+            $this->io->write(sprintf('<info>Skipping the "%s" file</info>', $realFile));
+            return;
+        }
 
         $exists = is_file($realFile);
 

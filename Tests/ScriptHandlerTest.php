@@ -39,6 +39,7 @@ class ScriptHandlerTest extends TestCase
         $composer->getPackage()->willReturn($this->package);
         $this->event->getComposer()->willReturn($composer);
         $this->event->getIO()->willReturn($this->io);
+        $this->event->isDevMode()->willReturn(true);
     }
 
     /**
