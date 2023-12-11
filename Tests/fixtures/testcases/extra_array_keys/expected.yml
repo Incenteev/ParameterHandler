@@ -1,0 +1,14 @@
+# This file is auto-generated during the composer install
+parameters:
+    foo: existing_foo
+    bare:
+        foo2: existing_foo2
+        foo3: existing_foo3
+        foo4: existing_foo4
+        foo5:
+            bare2:
+                - bloup
+                - glop
+        foo1: existing_foo1
+extra_key: 'a new extra key'
+another_key: foo
