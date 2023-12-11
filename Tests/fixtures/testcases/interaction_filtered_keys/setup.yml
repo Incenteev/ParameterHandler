@@ -1,0 +1,16 @@
+title: Non-interactive keys are not asked interactively
+
+interactive: true
+
+config:
+    interactive-keys:
+        - boolean
+        - another
+
+requested_params:
+    boolean:
+        default: 'false'
+        input: 'true'
+    another:
+        default: test
+        input: test
