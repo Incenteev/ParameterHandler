@@ -31,7 +31,7 @@ class ScriptHandler
                 throw new \InvalidArgumentException('The extra.incenteev-parameters setting must be an array of configuration objects.');
             }
 
-            $processor->processFile($config);
+            $processor->processFile($config, $event->isDevMode());
         }
     }
 }
