@@ -104,7 +104,9 @@ class Processor
         // Add the params coming from the environment values
         $actualParams = array_replace($actualParams, $this->getEnvValues($envMap));
 
-        return $this->getParams($expectedParams, $actualParams);
+        $interactiveParams = empty($config['interactive-keys']) ? array() : $config['interactive-keys'];
+
+        return $this->getParams($expectedParams, $actualParams, $interactiveParams);
     }
 
     private function getEnvValues(array $envMap)
@@ -137,7 +139,7 @@ class Processor
         return $actualParams;
     }
 
-    private function getParams(array $expectedParams, array $actualParams)
+    private function getParams(array $expectedParams, array $actualParams, array $interactiveParams)
     {
         // Simply use the expectedParams value as default for the missing params.
         if (!$this->io->isInteractive()) {
@@ -145,9 +147,16 @@ class Processor
         }
 
         $isStarted = false;
+        $hasWhitelist = count($interactiveParams) > 0;
 
         foreach ($expectedParams as $key => $message) {
             if (array_key_exists($key, $actualParams)) {
+                continue;
+            }
+
+            if ($hasWhitelist && !in_array($key, $interactiveParams)) {
+                $actualParams[$key] = $message;
+
                 continue;
             }
 

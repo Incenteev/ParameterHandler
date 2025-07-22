@@ -1,0 +1,10 @@
+parameters:
+    boolean: false
+    another: test
+    nested:
+        foo: bar
+        bar:
+            - foo
+            - test
+            - null
+
