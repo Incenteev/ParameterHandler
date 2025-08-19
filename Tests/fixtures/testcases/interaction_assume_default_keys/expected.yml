@@ -1,0 +1,5 @@
+# This file is auto-generated during the composer install
+parameters:
+    foo: bar
+    boolean: true
+    another: test_input
