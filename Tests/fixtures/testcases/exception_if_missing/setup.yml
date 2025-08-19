@@ -1,0 +1,6 @@
+title: Missing keys involves exception thrown in non-interaction mode
+
+config:
+    exception-if-missing: true
+
+missing_params: ['another', 'boolean']
