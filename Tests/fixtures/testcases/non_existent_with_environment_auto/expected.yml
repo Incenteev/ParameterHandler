@@ -1,0 +1,11 @@
+# This file is auto-generated during the composer install
+parameters:
+    ic_test_foo: foobar
+    ic_test_bool: true
+    another: null
+    ic_test_nested:
+        foo: env_foo
+        bar:
+            - env
+            - test
+            - null

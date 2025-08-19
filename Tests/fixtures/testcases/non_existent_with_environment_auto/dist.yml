@@ -1,0 +1,7 @@
+parameters:
+    ic_test_foo: bar
+    ic_test_bool: false
+    another: ~
+    ic_test_nested:
+        foo: bar
+        bar: baz
