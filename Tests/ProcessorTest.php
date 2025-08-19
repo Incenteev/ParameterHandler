@@ -160,7 +160,11 @@ class ProcessorTest extends TestCase
         }
 
         if (!empty($testCase['requested_params'])) {
-            $this->io->write('<comment>Some parameters are missing. Please provide them.</comment>')->shouldBeCalledTimes(1);
+            if (empty($testCase['config']['comment'])) {
+                $this->io->write('<comment>Some parameters are missing. Please provide them.</comment>')->shouldBeCalledTimes(1);
+            } else {
+                $this->io->write(sprintf('<comment>%s</comment>', $testCase['config']['comment']))->shouldBeCalledTimes(1);
+            }
         }
 
         foreach ($testCase['requested_params'] as $param => $settings) {
