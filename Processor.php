@@ -92,7 +92,7 @@ class Processor
 
         $keepOutdatedParams = false;
         if (isset($config['keep-outdated'])) {
-            $keepOutdatedParams = (boolean) $config['keep-outdated'];
+            $keepOutdatedParams = (bool) $config['keep-outdated'];
         }
 
         if (!$keepOutdatedParams) {
