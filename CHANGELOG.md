@@ -1,6 +1,11 @@
+## 2.3.0 (2025-11-26)
+
+* Add support for symfony/yaml 8
+* Fix PHP 8.5 deprecations
+
 ## 2.2.0 (2023-12-09)
 
-* Drop support for old PHP versions. The min version is now PGP 7.4.
+* Drop support for old PHP versions. The min version is now PHP 7.4.
 * Drop support for old Symfony versions. The min version is now Symfony 5.4
 * Mark symfony/yaml 7 as supported
 
