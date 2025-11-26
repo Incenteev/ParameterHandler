@@ -1,0 +1,12 @@
+parameters:
+    foo: bar
+    bare:
+        foo2: existing_foo2
+        foo3: existing_foo3
+        foo4: existing_foo4
+        foo5:
+            bare2:
+                - bloup
+                - glop
+
+extra_key: a new extra key
