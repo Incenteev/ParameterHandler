@@ -1,0 +1,14 @@
+title: Existing values are not asked interactively again
+
+interactive: true
+
+config:
+    assume-default-for-keys: [foo]
+
+requested_params:
+    boolean:
+        default: 'false'
+        input: 'true'
+    another:
+        default: 'null'
+        input: 'test_input'
