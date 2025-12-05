@@ -6,8 +6,10 @@ config:
         foo: IC_TEST_FOO
         nested: IC_TEST_NESTED
         another: IC_TEST_NOT_SET
+        empty: IC_TEST_EMPTY
 
 environment:
     IC_TEST_BOOL: 'true'
     IC_TEST_FOO: 'foobar'
     IC_TEST_NESTED: '{foo: env_foo, bar: [env, test, null]}'
+    IC_TEST_EMPTY: ''
