@@ -104,7 +104,7 @@ class Processor
         // Add the params coming from the environment values
         $actualParams = array_replace($actualParams, $this->getEnvValues($envMap));
 
-        return $this->getParams($expectedParams, $actualParams);
+        return $this->getParams($config, $expectedParams, $actualParams);
     }
 
     private function getEnvValues(array $envMap)
@@ -137,10 +137,14 @@ class Processor
         return $actualParams;
     }
 
-    private function getParams(array $expectedParams, array $actualParams)
+    private function getParams(array $config, array $expectedParams, array $actualParams)
     {
-        // Simply use the expectedParams value as default for the missing params.
         if (!$this->io->isInteractive()) {
+            if (!empty($config['exception-if-missing']) && $missingParams = array_diff_key($expectedParams, $actualParams)) {
+                // Throw exception in non-interactive mode if some params are missing
+                throw new \RuntimeException(sprintf("Some parameters are missing: %s. Please fill them.", implode(", ", array_keys($missingParams))));
+            }
+            // Simply use the expectedParams value as default for the missing params
             return array_replace($expectedParams, $actualParams);
         }
 
